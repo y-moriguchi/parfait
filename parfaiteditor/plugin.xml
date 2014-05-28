@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="net.morilib.parfait.editor.ParfaitPageEditor"
+            default="true"
+            extensions="gparfait"
+            id="net.morilib.parfait.editor"
+            name="Hash Function">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            class="net.morilib.parfait.wizard.ParfaitWizard"
+            id="net.morilib.parfait.newwizard"
+            name="Perfect Hash Function Definition">
+      </wizard>
+   </extension>
+
+</plugin>
