@@ -41,7 +41,7 @@ public class ParfaitImportWizard extends Wizard {
 	 * 
 	 */
 	public ParfaitImportWizard(ParfaitKeywordsEditor ed) {
-		setWindowTitle("Imports keywords");
+		setWindowTitle("Import keywords");
 		editor = ed;
 	}
 
@@ -61,10 +61,13 @@ public class ParfaitImportWizard extends Wizard {
 		CSVConfig cc;
 		String[] ar;
 		Charset cs;
+		int kw, aw;
 		File fl;
 
 		fn = page1.filename.getText();
 		en = page1.encoding.getText();
+		kw = Integer.parseInt(page1.keycolumn.getText()) - 1;
+		aw = Integer.parseInt(page1.mapcolumn.getText()) - 1;
 		if(fn == null || fn.equals("")) {
 			return true;
 		} else {
@@ -82,9 +85,13 @@ public class ParfaitImportWizard extends Wizard {
 			cc = new CSVConfig(",", '"', false);
 			cv = new StringCSVPullParser(rd, cc);
 			while(cv.next()) {
-				if((ar = cv.get()).length > 0) {
+				ar = cv.get();
+				if(ar.length > kw) {
 					kb = new KeywordBean();
-					kb.setKeyword(ar[0]);
+					kb.setKeyword(ar[kw]);
+					if(ar.length > aw) {
+						kb.setAction(ar[aw]);
+					}
 					editor.addKeyword(kb);
 				}
 			}

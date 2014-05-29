@@ -93,7 +93,8 @@ public class KeysigStatistics<T> {
 	 * @return
 	 */
 	public static<T> KeysigStatistics<T> compute(MyCharacterSet<T> ks,
-			List<Keysig<T>> a, int add, boolean pass1) {
+			List<Keysig<T>> a, int add, boolean pass1,
+			boolean addlength) {
 		KeysigStatistics<T> s = new KeysigStatistics<T>();
 		boolean dirty = true;
 		Set<T> v;
@@ -103,9 +104,9 @@ public class KeysigStatistics<T> {
 		while(dirty) {
 			dirty = false;
 			for(int k = 1; k < a.size(); k++) {
-				h = s.hashCode(a.get(k));
+				h = s.hashCode(a.get(k), addlength);
 				for(int m = 0; m < k; m++) {
-					g = s.hashCode(a.get(m));
+					g = s.hashCode(a.get(m), addlength);
 					if(h != g) {
 						// do nothing
 					} else if((v = a.get(k)
@@ -123,7 +124,7 @@ public class KeysigStatistics<T> {
 
 		s.totalKeywords = a.size();
 		for(Keysig<T> t : a) {
-			h = s.hashCode(t);
+			h = s.hashCode(t, addlength);
 			s.range.put(h, t);
 			s.maxHashValue = h < s.maxHashValue ? s.maxHashValue : h;
 			s.minHashValue = h > s.minHashValue ? s.minHashValue : h;
@@ -137,8 +138,8 @@ public class KeysigStatistics<T> {
 	 * @param a
 	 * @return
 	 */
-	public int hashCode(Keysig<T> a) {
-		int r = a.getLength();
+	public int hashCode(Keysig<T> a, boolean addlength) {
+		int r = addlength ? a.getLength() : 0;
 
 		for(T t : a) {
 			r += getAssoValue(t);

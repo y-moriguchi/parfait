@@ -43,11 +43,11 @@ public class KeysigDrv {
 		l.add(Keysig.newInstance("ov", 0));
 		l.add(Keysig.newInstance("ec", 0));
 		m = new MyCharacterSet<Character>(l);
-		s = KeysigStatistics.compute(m, l, 1, false);
+		s = KeysigStatistics.compute(m, l, 1, false, false);
 		s.report(System.out);
 
 		for(Keysig<Character> k : l) {
-			System.out.printf("%10s %7d\n", k, s.hashCode(k));
+			System.out.printf("%10s %7d\n", k, s.hashCode(k, false));
 		}
 	}
 

@@ -15,8 +15,12 @@
  */
 package net.morilib.parfait.wizard;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -32,7 +36,7 @@ public class ParfaitImportWizardPage extends WizardPage {
 
 	//
 	Combo encoding;
-	Text filename;
+	Text filename, keycolumn, mapcolumn;
 
 	/**
 	 * 
@@ -40,6 +44,35 @@ public class ParfaitImportWizardPage extends WizardPage {
 	protected ParfaitImportWizardPage() {
 		super("ImportWizardPage");
 		setTitle("Import keywords");
+	}
+
+	//
+	private static final Pattern NUM = Pattern.compile("[0-9]+");
+
+	//
+	private void doValidate() {
+		String s;
+
+		if((s = filename.getText()) == null || s.equals("")) {
+			setErrorMessage("Filename must not be empty.");
+			setPageComplete(false);
+		} else if((s = keycolumn.getText()) == null || s.equals("")) {
+			setErrorMessage("Keyword column must not be empty.");
+			setPageComplete(false);
+		} else if(!NUM.matcher(s).matches()) {
+			setErrorMessage("Keyword column must be positive integer.");
+			setPageComplete(false);
+		} else if(Integer.parseInt(s) == 0) {
+			setErrorMessage("Keyword column must be positive integer.");
+			setPageComplete(false);
+		} else if((s = mapcolumn.getText()) != null && !s.equals("") &&
+				(!NUM.matcher(s).matches() || Integer.parseInt(s) == 0)) {
+			setErrorMessage("Action column must be positive integer.");
+			setPageComplete(false);
+		} else {
+			setErrorMessage(null);
+			setPageComplete(true);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -58,8 +91,16 @@ public class ParfaitImportWizardPage extends WizardPage {
 		filename = new Text(cm, SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		filename.setLayoutData(gd);
+		filename.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				doValidate();
+			}
+
+		});
 		b1 = new Button(cm, SWT.BORDER);
-		b1.setText("Browse");
+		b1.setText("Browse...");
 		b1.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -85,7 +126,43 @@ public class ParfaitImportWizardPage extends WizardPage {
 		encoding.add("EUC-JP");
 		encoding.add("Shift_JIS");
 		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
 		encoding.setLayoutData(gd);
+
+		lb = new Label(cm, SWT.NULL);
+		lb.setText("Keyword column");
+		keycolumn = new Text(cm, SWT.BORDER);
+		keycolumn.setText("1");
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		gd.widthHint = 50;
+		keycolumn.setLayoutData(gd);
+		keycolumn.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				doValidate();
+			}
+
+		});
+
+		lb = new Label(cm, SWT.NULL);
+		lb.setText("Action(Map) column");
+		mapcolumn = new Text(cm, SWT.BORDER);
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		gd.widthHint = 50;
+		mapcolumn.setLayoutData(gd);
+		mapcolumn.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				doValidate();
+			}
+
+		});
+
+		doValidate();
 		setControl(cm);
 	}
 

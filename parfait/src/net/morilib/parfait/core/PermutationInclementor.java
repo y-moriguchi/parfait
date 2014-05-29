@@ -174,7 +174,7 @@ implements Iterable<Integer>, Cloneable {
 		TinySortedBag<MyChar> b = new TinySortedBag<MyChar>();
 
 		_pick(b, s);
-		return new Keysig<MyChar>(b, 0);
+		return new Keysig<MyChar>(b, s.length());
 	}
 
 	//
@@ -207,7 +207,7 @@ implements Iterable<Integer>, Cloneable {
 		TinySortedBag<MyChar> b = new TinySortedBag<MyChar>();
 
 		_pickbyte(b, s);
-		return new Keysig<MyChar>(b, 0);
+		return new Keysig<MyChar>(b, s.length() * 2);
 	}
 
 	/* (non-Javadoc)

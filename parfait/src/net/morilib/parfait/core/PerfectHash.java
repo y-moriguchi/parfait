@@ -30,16 +30,18 @@ public class PerfectHash {
 	private PermutationInclementor perm;
 	private int minWordLength;
 	private int maxWordLength;
+	private boolean addLength;
 
 	//
 	private PerfectHash(SortedSet<MyChar> c,
 			KeysigStatistics<MyChar> s, PermutationInclementor p,
-			int max, int min) {
+			int max, int min, boolean add) {
 		cset = c;
 		stat = s;
 		perm = p;
 		maxWordLength = max;
 		minWordLength = min;
+		addLength = add;
 	}
 
 	/**
@@ -190,7 +192,7 @@ public class PerfectHash {
 		Keysig<MyChar> k;
 
 		k = isByte() ? perm.pickByte(s) : perm.pickCharacter(s);
-		return stat.hashCode(k);
+		return stat.hashCode(k, addLength);
 	}
 
 	/**
@@ -225,11 +227,16 @@ public class PerfectHash {
 			} else {
 				for(String s : keys)  l.add(p.pickByte(s));
 			}
-
 			t = new MyCharacterSet<MyChar>(l);
-			r = KeysigStatistics.compute(t, l, add, false);
+
+			r = KeysigStatistics.compute(t, l, add, false, false);
 			if(r != null) {
-				return new PerfectHash(c, r, p, x, m);
+				return new PerfectHash(c, r, p, x, m, false);
+			}
+
+			r = KeysigStatistics.compute(t, l, add, false, true);
+			if(r != null) {
+				return new PerfectHash(c, r, p, x, m, true);
 			}
 		} while((p = p.nextAll()) != null);
 		return null;
