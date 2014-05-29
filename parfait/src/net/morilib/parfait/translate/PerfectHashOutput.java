@@ -108,7 +108,7 @@ public final class PerfectHashOutput {
 		hf.printMappedWordlist(wr, p, map);
 		hf.printHashFunction(wr, p);
 		hf.printLookupFunction(wr, p);
-		hf.printMapFunction(wr);
+		hf.printMapFunction(wr, p);
 		hf.printAuxiliary(wr, aux);
 		hf.printClassEpilogue(wr);
 	}

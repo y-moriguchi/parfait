@@ -67,4 +67,20 @@ public class KeywordsBean {
 		return keys.indexOf(f);
 	}
 
+	/**
+	 * 
+	 */
+	public void clear() {
+		keys.clear();
+	}
+
+	/**
+	 * 
+	 * @param k
+	 * @return
+	 */
+	public KeywordBean get(int k) {
+		return keys.get(k);
+	}
+
 }

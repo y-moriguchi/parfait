@@ -118,6 +118,14 @@ public class PerfectHash {
 
 	/**
 	 * 
+	 * @return
+	 */
+	public boolean isAddLength() {
+		return addLength;
+	}
+
+	/**
+	 * 
 	 * @param x
 	 * @return
 	 */

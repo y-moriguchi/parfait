@@ -110,7 +110,7 @@ public interface HashFormatter {
 	 * 
 	 * @param wr
 	 */
-	public void printMapFunction(PrintWriter wr);
+	public void printMapFunction(PrintWriter wr, PerfectHash ph);
 
 	/**
 	 * 

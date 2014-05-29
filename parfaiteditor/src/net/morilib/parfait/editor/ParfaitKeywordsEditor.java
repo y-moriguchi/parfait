@@ -24,6 +24,7 @@ import net.morilib.parfait.file.DeserializeParfaitXML;
 import net.morilib.parfait.file.KeywordBean;
 import net.morilib.parfait.file.KeywordsBean;
 import net.morilib.parfait.file.ParfaitBean;
+import net.morilib.parfait.misc.MyGridLayout;
 import net.morilib.parfait.wizard.ParfaitImportWizard;
 
 import org.eclipse.core.resources.IFile;
@@ -115,7 +116,7 @@ public class ParfaitKeywordsEditor extends FormPage {
 		gd = new GridData(GridData.FILL_BOTH);
 		sc.setLayoutData(gd);
 		cm = tk.createComposite(sc);
-		cm.setLayout(new GridLayout(2, false));
+		cm.setLayout(new MyGridLayout(2, false));
 
 		b1 = tk.createButton(cm, "Import from a file", SWT.BORDER);
 		gd = new GridData();
@@ -136,8 +137,12 @@ public class ParfaitKeywordsEditor extends FormPage {
 
 		});
 
-		tb = tk.createTable(cm,
-				SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		tb = tk.createTable(cm, SWT.H_SCROLL | SWT.V_SCROLL |
+				SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER);
+		gd = new GridData(GridData.FILL_BOTH);
+		tb.setLayoutData(gd);
+		tb.setHeaderVisible(true);
+		tb.setLinesVisible(true);
 		tvkey = new TableViewer(tb);
 
 		c1 = new TableViewerColumn(tvkey, SWT.LEFT);
@@ -148,10 +153,7 @@ public class ParfaitKeywordsEditor extends FormPage {
 		c1.getColumn().setText("Action");
 		c1.getColumn().setWidth(300);
 		c1.getColumn().setMoveable(true);
-		tb.setHeaderVisible(true);
 
-		gd = new GridData(GridData.FILL_BOTH);
-		tb.setLayoutData(gd);
 		tvkey.setColumnProperties(
 				KeywordsCellModifier.getAllProperties());
 		ea = new CellEditor[] {
@@ -191,6 +193,19 @@ public class ParfaitKeywordsEditor extends FormPage {
 				fb = (KeywordBean)ss.getFirstElement();
 				tvkey.remove(fb);
 				lbean.remove(fb);
+				setDirty(true);
+			}
+
+		});
+		b1 = tk.createButton(cn, "Clear", SWT.NONE);
+		b1.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				for(int k = 0; k < lbean.size(); k++) {
+					tvkey.remove(lbean.get(k));
+				}
+				lbean.clear();
 				setDirty(true);
 			}
 

@@ -176,6 +176,7 @@ public class JavaHashFormatter implements HashFormatter {
 		PermutationInclementor p = ph.getPermutation();
 		String d = "\t\treturn (";
 		int out = ph.getMaxHashValue() + 1;
+		boolean uselen;
 
 		wr.println("\tprivate static int _getasso(String s, int l) {");
 		if(ph.isASCII()) {
@@ -185,12 +186,12 @@ public class JavaHashFormatter implements HashFormatter {
 		} else if(ph.isByte()) {
 			wr.println("\t\tint c = s.charAt(l / 2);");
 			wr.println();
-			wr.println("\t\treturn asso_value[(l % 2 > 0 ? c & 0xff : c >> 8)];");
+			wr.println("\t\treturn asso_values[(l % 2 > 0 ? c & 0xff : c >> 8)];");
 		} else {
 			wr.println("\t\tint c = s.charAt(l);");
 			wr.println();
-			wr.printf("\t\treturn c < %d || c > %d ? %d : asso_values[c];\n",
-					ph.getMinimum(), ph.getMaximum(), out);
+			wr.printf("\t\treturn c < %d || c > %d ? %d : asso_values[c - %d];\n",
+					ph.getMinimum(), ph.getMaximum(), out, ph.getMinimum());
 		}
 		wr.println("\t}");
 
@@ -198,7 +199,20 @@ public class JavaHashFormatter implements HashFormatter {
 		wr.println("\t\tint l;");
 		wr.println();
 		wr.printf("\t\tif(s == null)  return %d;\n", out);
-		if(ph.isByte()) {
+
+		uselen = ph.isAddLength();
+		if(!uselen) {
+			for(int k : p) {
+				if(k < 0) {
+					uselen = true;
+					break;
+				}
+			}
+		}
+
+		if(!uselen) {
+			// do nothing
+		} else if(ph.isByte()) {
 			wr.println("\t\tl = s.length() * 2;");
 		} else {
 			wr.println("\t\tl = s.length();");
@@ -212,7 +226,12 @@ public class JavaHashFormatter implements HashFormatter {
 			}
 			d = " +\n\t\t\t\t";
 		}
-		wr.println(");\n\t}");
+
+		if(ph.isAddLength()) {
+			wr.println(" + l);\n\t}");
+		} else {
+			wr.println(");\n\t}");
+		}
 		wr.println();
 	}
 
@@ -226,7 +245,8 @@ public class JavaHashFormatter implements HashFormatter {
 		wr.println();
 		wr.println("\t\tif(l < MIN_HASH_VALUE || l > MAX_HASH_VALUE) {");
 		wr.println("\t\t\treturn null;");
-		wr.println("\t\t} else if((s = wordlist[l]) != null) {");
+		wr.printf ("\t\t} else if((s = wordlist[l - %d]) != null) {\n",
+				ph.getMinHashValue());
 		wr.println("\t\t\treturn s;");
 		wr.println("\t\t} else {");
 		wr.println("\t\t\treturn null;");
@@ -278,14 +298,20 @@ public class JavaHashFormatter implements HashFormatter {
 	}
 
 	@Override
-	public void printMapFunction(PrintWriter wr) {
+	public void printMapFunction(PrintWriter wr, PerfectHash ph) {
 		wr.println("\tpublic static String lookup(String key) {");
 		wr.println("\t\tint l = hashCode(key);");
 		wr.println("\t\tString s;");
 		wr.println();
 		wr.println("\t\tif(l < MIN_HASH_VALUE || l > MAX_HASH_VALUE) {");
 		wr.println("\t\t\treturn null;");
-		wr.println("\t\t} else if((s = mapped_wordlist[l]) != null) {");
+		wr.printf ("\t\t} else if((s = wordlist[l - %d]) == null) {\n",
+				ph.getMinHashValue());
+		wr.println("\t\t\treturn null;");
+		wr.println("\t\t} else if(!s.equals(key)) {");
+		wr.println("\t\t\treturn null;");
+		wr.printf ("\t\t} else if((s = mapped_wordlist[l - %d]) != null) {\n",
+				ph.getMinHashValue());
 		wr.println("\t\t\treturn s;");
 		wr.println("\t\t} else {");
 		wr.println("\t\t\treturn null;");

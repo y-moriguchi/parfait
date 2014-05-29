@@ -190,9 +190,9 @@ implements Iterable<Integer>, Cloneable {
 	private void _pickbyte(TinySortedBag<MyChar> b, String s) {
 		if(basis != null) {
 			if(value < 0) {
-				b.add(_getb(s, s.length() + value));
+				b.add(_getb(s, s.length() * 2 + value));
 			} else {
-				b.add(_getb(s, s.charAt(value)));
+				b.add(_getb(s, value));
 			}
 			basis._pick(b, s);
 		}
