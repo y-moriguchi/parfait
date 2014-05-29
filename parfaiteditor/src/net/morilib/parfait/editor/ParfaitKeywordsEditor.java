@@ -24,6 +24,7 @@ import net.morilib.parfait.file.DeserializeParfaitXML;
 import net.morilib.parfait.file.KeywordBean;
 import net.morilib.parfait.file.KeywordsBean;
 import net.morilib.parfait.file.ParfaitBean;
+import net.morilib.parfait.wizard.ParfaitImportWizard;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -32,6 +33,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -78,6 +80,15 @@ public class ParfaitKeywordsEditor extends FormPage {
 		return Collections.unmodifiableList(lbean.getList());
 	}
 
+	/**
+	 * 
+	 * @param b
+	 */
+	public void addKeyword(KeywordBean b) {
+		tvkey.add(b);
+		lbean.add(b);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormPage#createFormContent(org.eclipse.ui.forms.IManagedForm)
 	 */
@@ -86,10 +97,11 @@ public class ParfaitKeywordsEditor extends FormPage {
 		ScrolledForm form = managedForm.getForm();
 		FormToolkit tk = managedForm.getToolkit();
 		GridLayout gl = new GridLayout(1, false);
-		GridData g2 = new GridData(GridData.FILL_BOTH);
-		Composite ct = form.getBody(), cm, cn;
+		final Composite ct = form.getBody();
 		TableViewerColumn c1;
+		Composite cm, cn;
 		CellEditor[] ea;
+		GridData gd;
 		Section sc;
 		Button b1;
 		Table tb;
@@ -100,9 +112,29 @@ public class ParfaitKeywordsEditor extends FormPage {
 		// operators
 		sc = tk.createSection(ct, Section.TITLE_BAR);
 		sc.setText("Keywords");
-		sc.setLayoutData(g2);
+		gd = new GridData(GridData.FILL_BOTH);
+		sc.setLayoutData(gd);
 		cm = tk.createComposite(sc);
 		cm.setLayout(new GridLayout(2, false));
+
+		b1 = tk.createButton(cm, "Import from a file", SWT.BORDER);
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		b1.setLayoutData(gd);
+		b1.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ParfaitImportWizard iw;
+				WizardDialog wd;
+
+				iw = new ParfaitImportWizard(
+						ParfaitKeywordsEditor.this);
+				wd = new WizardDialog(ct.getShell(), iw);
+				wd.open();
+			}
+
+		});
 
 		tb = tk.createTable(cm,
 				SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
@@ -118,7 +150,8 @@ public class ParfaitKeywordsEditor extends FormPage {
 		c1.getColumn().setMoveable(true);
 		tb.setHeaderVisible(true);
 
-		tb.setLayoutData(g2);
+		gd = new GridData(GridData.FILL_BOTH);
+		tb.setLayoutData(gd);
 		tvkey.setColumnProperties(
 				KeywordsCellModifier.getAllProperties());
 		ea = new CellEditor[] {
