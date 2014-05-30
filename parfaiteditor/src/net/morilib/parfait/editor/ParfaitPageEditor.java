@@ -126,23 +126,34 @@ public class ParfaitPageEditor extends FormEditor {
 	}
 
 	//
-	private void convert(IFile g, HashFormatter hf,
+	private void convert(IFile f, IFile g, HashFormatter hf,
 			IProgressMonitor mon) throws CoreException {
 		ByteArrayOutputStream bot = new ByteArrayOutputStream();
 		ByteArrayInputStream bin;
 		PrintWriter p;
+		IMarker m;
 		String n;
 
 		p = new PrintWriter(new OutputStreamWriter(bot), true);
 		n = g.getName().replaceFirst("\\.[^\\.]+$", "");
-		ConvertToTargetFile.output(hf, p, n, this);
-		p.close();
-
-		bin = new ByteArrayInputStream(bot.toByteArray());
-		if(g.exists()) {
-			g.setContents(bin, true, false, mon);
+		if(keywords.getKeywordList().size() == 0) {
+			m = f.createMarker(IMarker.PROBLEM);
+			m.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+			m.setAttribute(IMarker.MESSAGE, "There are no keywords");
+		} else if(ConvertToTargetFile.output(hf, p, n, this)) {
+			p.close();
+			bin = new ByteArrayInputStream(bot.toByteArray());
+			if(g.exists()) {
+				g.setContents(bin, true, false, mon);
+			} else {
+				g.create(bin, true, mon);
+			}
 		} else {
-			g.create(bin, true, mon);
+			p.close();
+			m = f.createMarker(IMarker.PROBLEM);
+			m.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+			m.setAttribute(IMarker.MESSAGE,
+					"Collision of the hash value has occured");
 		}
 	}
 
@@ -159,7 +170,7 @@ public class ParfaitPageEditor extends FormEditor {
 					true, false, mon);
 			f.deleteMarkers(IMarker.PROBLEM, true,
 					IResource.DEPTH_INFINITE);
-			convert(getFile(hf), hf, mon);
+			convert(f, getFile(hf), hf, mon);
 
 			keywords.setDirty(false);
 			description.setDirty(false);
@@ -200,7 +211,7 @@ public class ParfaitPageEditor extends FormEditor {
 							ParfaitPageEditor.this);
 					f.create(new ByteArrayInputStream(b.toByteArray()),
 							true, mon);
-					convert(getFile(f, hf), hf, mon);
+					convert(f, getFile(f, hf), hf, mon);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}

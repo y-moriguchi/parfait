@@ -179,8 +179,11 @@ public class KeysigStatistics<T> {
 	 * @return
 	 */
 	public int getAssoValue(T x) {
-		return keyset.contains(x) ?
-				assoValue.containsKey(x) ? assoValue.get(x) : 0 : -1;
+		if(keyset.contains(x)) {
+			return assoValue.containsKey(x) ? assoValue.get(x) : 0;
+		} else {
+			return -1;
+		}
 	}
 
 	/**

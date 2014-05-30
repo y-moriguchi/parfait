@@ -273,7 +273,11 @@ public class JavaHashFormatter implements HashFormatter {
 		wr.println();
 		wr.println("\t\tif(v == null) {");
 		wr.println("\t\t\t" + d);
-		wr.println("\t\t} else if((l = v.length()) < MIN_WORD_LENGTH) {");
+		if(ph.isByte()) {
+			wr.println("\t\t} else if((l = v.length() * 2) < MIN_WORD_LENGTH) {");
+		} else {
+			wr.println("\t\t} else if((l = v.length()) < MIN_WORD_LENGTH) {");
+		}
 		wr.println("\t\t\t" + d);
 		wr.println("\t\t} else if(l > MAX_WORD_LENGTH) {");
 		wr.println("\t\t\t" + d);

@@ -15,10 +15,13 @@ public final class ConvertToTargetFile {
 
 	/**
 	 * 
+	 * @param hf
 	 * @param wr
+	 * @param name
 	 * @param ed
+	 * @return
 	 */
-	public static void output(HashFormatter hf, PrintWriter wr,
+	public static boolean output(HashFormatter hf, PrintWriter wr,
 			String name, ParfaitPageEditor ed) {
 		String license, defAction, prologue, desc, aux;
 		Map<String, String> map;
@@ -34,14 +37,16 @@ public final class ConvertToTargetFile {
 		aux       = ed.getAuxiliary().getAuxiliary();
 
 		if(ed.getOptions().isAction()) {
-			PerfectHashOutput.printExecute(wr, hf, name, map,
+			return PerfectHashOutput.printExecute(wr, hf, name, map,
 					defAction, license, prologue, desc, aux);
 		} else if(ed.getOptions().isLookup()) {
-			PerfectHashOutput.printLookup(wr, hf, name, map.keySet(),
-					license, prologue, desc, aux);
+			return PerfectHashOutput.printLookup(wr, hf, name,
+					map.keySet(), license, prologue, desc, aux);
 		} else if(ed.getOptions().isMap()) {
-			PerfectHashOutput.printMap(wr, hf, name, map, license,
-					prologue, desc, aux);
+			return PerfectHashOutput.printMap(wr, hf, name, map,
+					license, prologue, desc, aux);
+		} else {
+			throw new RuntimeException();
 		}
 	}
 

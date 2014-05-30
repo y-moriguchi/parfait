@@ -17,11 +17,31 @@ package net.morilib.parfait.file;
 
 public class ParfaitBean {
 
+	/**
+	 * 
+	 */
+	public static final String R_ACTION  = "action";
+
+	/**
+	 * 
+	 */
+	public static final String R_LOOKUP  = "lookup";
+
+	/**
+	 * 
+	 */
+	public static final String R_MAP     = "map";
+
+	/**
+	 * 
+	 */
+	public static final String R_DEFAULT = R_ACTION;
+
 	//
 	KeywordsBean keywords = new KeywordsBean();
 	DescriptionBean description = new DescriptionBean();
 	AuxiliaryCodeBean auxiliary = new AuxiliaryCodeBean();
-	String functionType, defaultAction;
+	String functionType = R_DEFAULT, defaultAction;
 
 	/**
 	 * 

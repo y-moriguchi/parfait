@@ -34,13 +34,18 @@ public final class PerfectHashOutput {
 	 * @param defaultAction
 	 * @param license
 	 * @param prologue
+	 * @return
 	 */
-	public static void printExecute(PrintWriter wr, HashFormatter hf,
-			String name, Map<String, String> map, String defaultAction,
-			String license, String prologue, String desc, String aux) {
+	public static boolean printExecute(PrintWriter wr,
+			HashFormatter hf, String name, Map<String, String> map,
+			String defaultAction, String license, String prologue,
+			String desc, String aux) {
 		PerfectHash p;
 
-		p  = PerfectHash.chooseKeys(1, map.keySet());
+		p = PerfectHash.chooseKeys(1, map.keySet());
+		if(p == null) {
+			return false;
+		}
 		hf.printLicense(wr, license);
 		hf.printPrologue(wr, prologue);
 		hf.printDescription(wr, desc);
@@ -53,6 +58,7 @@ public final class PerfectHashOutput {
 		hf.printExecuteFunction(wr, p, map, defaultAction);
 		hf.printAuxiliary(wr, aux);
 		hf.printClassEpilogue(wr);
+		return true;
 	}
 
 	/**
@@ -64,12 +70,15 @@ public final class PerfectHashOutput {
 	 * @param license
 	 * @param prologue
 	 */
-	public static void printLookup(PrintWriter wr, HashFormatter hf,
+	public static boolean printLookup(PrintWriter wr, HashFormatter hf,
 			String name, Iterable<String> agg, String license,
 			String prologue, String desc, String aux) {
 		PerfectHash p;
 
-		p  = PerfectHash.chooseKeys(1, agg);
+		p = PerfectHash.chooseKeys(1, agg);
+		if(p == null) {
+			return false;
+		}
 		hf.printLicense(wr, license);
 		hf.printPrologue(wr, prologue);
 		hf.printDescription(wr, desc);
@@ -81,6 +90,7 @@ public final class PerfectHashOutput {
 		hf.printLookupFunction(wr, p);
 		hf.printAuxiliary(wr, aux);
 		hf.printClassEpilogue(wr);
+		return true;
 	}
 
 	/**
@@ -92,12 +102,15 @@ public final class PerfectHashOutput {
 	 * @param license
 	 * @param prologue
 	 */
-	public static void printMap(PrintWriter wr, HashFormatter hf,
+	public static boolean printMap(PrintWriter wr, HashFormatter hf,
 			String name, Map<String, String> map, String license,
 			String prologue, String desc, String aux) {
 		PerfectHash p;
 
-		p  = PerfectHash.chooseKeys(1, map.keySet());
+		p = PerfectHash.chooseKeys(1, map.keySet());
+		if(p == null) {
+			return false;
+		}
 		hf.printLicense(wr, license);
 		hf.printPrologue(wr, prologue);
 		hf.printDescription(wr, desc);
@@ -111,6 +124,7 @@ public final class PerfectHashOutput {
 		hf.printMapFunction(wr, p);
 		hf.printAuxiliary(wr, aux);
 		hf.printClassEpilogue(wr);
+		return true;
 	}
 
 }

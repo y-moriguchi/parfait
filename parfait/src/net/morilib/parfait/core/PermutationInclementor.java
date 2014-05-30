@@ -194,7 +194,7 @@ implements Iterable<Integer>, Cloneable {
 			} else {
 				b.add(_getb(s, value));
 			}
-			basis._pick(b, s);
+			basis._pickbyte(b, s);
 		}
 	}
 

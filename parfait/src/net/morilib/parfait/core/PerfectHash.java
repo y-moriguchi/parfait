@@ -211,6 +211,7 @@ public class PerfectHash {
 	public static PerfectHash chooseKeys(int add,
 			Iterable<String> keys) {
 		SortedSet<MyChar> c = new TreeSet<MyChar>();
+		SortedSet<MyChar> b = new TreeSet<MyChar>();
 		KeysigStatistics<MyChar> r;
 		MyCharacterSet<MyChar> t;
 		PermutationInclementor p;
@@ -223,11 +224,14 @@ public class PerfectHash {
 			x = x < s.length() ? s.length() : x;
 			for(int k = 0; k < s.length(); k++) {
 				c.add(MyChar.valueOf(s.charAt(k)));
+				b.add(MyChar.valueOf((char)(s.charAt(k) & 0xff)));
+				b.add(MyChar.valueOf((char)(s.charAt(k) >> 8)));
 			}
 		}
 
 		f = c.last().isASCII() || c.last().distance(c.first()) < 128;
 		p = new PermutationInclementor(0, f ? m : m * 2);
+		c = f ? c : b;
 		do {
 			l = new ArrayList<Keysig<MyChar>>();
 			if(f) {

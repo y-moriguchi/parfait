@@ -44,12 +44,6 @@ import org.eclipse.ui.forms.widgets.Section;
 public class OptionsEditor extends FormPage {
 
 	//
-	private static final String R_ACTION  = "action";
-	private static final String R_LOOKUP  = "lookup";
-	private static final String R_MAP     = "map";
-	private static final String R_DEFAULT = R_ACTION;
-
-	//
 	Text defaultAction;
 	Button rAction, rLookup, rMap;
 
@@ -83,13 +77,13 @@ public class OptionsEditor extends FormPage {
 		if(rAction == null) {
 			return oldtyp;
 		} else if(rAction.getSelection()) {
-			return R_ACTION;
+			return ParfaitBean.R_ACTION;
 		} else if(rLookup.getSelection()) {
-			return R_LOOKUP;
+			return ParfaitBean.R_LOOKUP;
 		} else if(rMap.getSelection()) {
-			return R_MAP;
+			return ParfaitBean.R_MAP;
 		} else {
-			return R_DEFAULT;
+			return ParfaitBean.R_DEFAULT;
 		}
 	}
 
@@ -98,7 +92,7 @@ public class OptionsEditor extends FormPage {
 	 * @return
 	 */
 	public boolean isAction() {
-		return R_ACTION.equals(getType());
+		return ParfaitBean.R_ACTION.equals(getType());
 	}
 
 	/**
@@ -106,7 +100,7 @@ public class OptionsEditor extends FormPage {
 	 * @return
 	 */
 	public boolean isLookup() {
-		return R_LOOKUP.equals(getType());
+		return ParfaitBean.R_LOOKUP.equals(getType());
 	}
 
 	/**
@@ -114,7 +108,7 @@ public class OptionsEditor extends FormPage {
 	 * @return
 	 */
 	public boolean isMap() {
-		return R_MAP.equals(getType());
+		return ParfaitBean.R_MAP.equals(getType());
 	}
 
 	//
@@ -172,11 +166,11 @@ public class OptionsEditor extends FormPage {
 		rMap    = tk.createButton(cm, "Map", SWT.RADIO);
 		if(oldtyp == null) {
 			olddef = "";
-		} else if(oldtyp.equals(R_ACTION)) {
+		} else if(oldtyp.equals(ParfaitBean.R_ACTION)) {
 			rAction.setSelection(true);
-		} else if(oldtyp.equals(R_LOOKUP)) {
+		} else if(oldtyp.equals(ParfaitBean.R_LOOKUP)) {
 			rLookup.setSelection(true);
-		} else if(oldtyp.equals(R_MAP)) {
+		} else if(oldtyp.equals(ParfaitBean.R_MAP)) {
 			rMap.setSelection(true);
 		}
 		ap = new SelectionAdapter() {

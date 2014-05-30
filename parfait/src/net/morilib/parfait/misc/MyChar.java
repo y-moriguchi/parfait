@@ -85,7 +85,7 @@ public class MyChar implements Comparable<MyChar> {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return Character.toString(value);
+		return value + "(" + (int)value + ")";
 	}
 
 }
