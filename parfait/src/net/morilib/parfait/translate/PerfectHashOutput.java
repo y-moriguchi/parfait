@@ -16,14 +16,33 @@
 package net.morilib.parfait.translate;
 
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Map;
 
 import net.morilib.parfait.core.PerfectHash;
+import net.morilib.parfait.core.PermutationInclementor;
 
 public final class PerfectHashOutput {
 
 	//
 	private PerfectHashOutput() {}
+
+	//
+	private static PerfectHash gethash(Collection<String> it,
+			String columns, boolean pluslen) {
+		PermutationInclementor i;
+		int x = -1;
+
+		if(columns != null) {
+			for(String s : it) {
+				x = x < s.length() ? s.length() : x;
+			}
+			i = PermutationInclementor.newInstance(columns, x);
+			return PerfectHash.chooseKeys(1, i, pluslen, it);
+		} else {
+			return PerfectHash.chooseKeys(1, it);
+		}
+	}
 
 	/**
 	 * 
@@ -37,13 +56,13 @@ public final class PerfectHashOutput {
 	 * @return
 	 */
 	public static boolean printExecute(PrintWriter wr,
-			HashFormatter hf, String name, Map<String, String> map,
+			HashFormatter hf, String columns, boolean pluslen,
+			String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux) {
 		PerfectHash p;
 
-		p = PerfectHash.chooseKeys(1, map.keySet());
-		if(p == null) {
+		if((p = gethash(map.keySet(), columns, pluslen)) == null) {
 			return false;
 		}
 		hf.printLicense(wr, license);
@@ -71,12 +90,12 @@ public final class PerfectHashOutput {
 	 * @param prologue
 	 */
 	public static boolean printLookup(PrintWriter wr, HashFormatter hf,
-			String name, Iterable<String> agg, String license,
-			String prologue, String desc, String aux) {
+			String columns, boolean pluslen, String name,
+			Collection<String> agg, String license, String prologue,
+			String desc, String aux) {
 		PerfectHash p;
 
-		p = PerfectHash.chooseKeys(1, agg);
-		if(p == null) {
+		if((p = gethash(agg, columns, pluslen)) == null) {
 			return false;
 		}
 		hf.printLicense(wr, license);
@@ -103,12 +122,12 @@ public final class PerfectHashOutput {
 	 * @param prologue
 	 */
 	public static boolean printMap(PrintWriter wr, HashFormatter hf,
-			String name, Map<String, String> map, String license,
-			String prologue, String desc, String aux) {
+			String columns, boolean pluslen, String name,
+			Map<String, String> map, String license, String prologue,
+			String desc, String aux) {
 		PerfectHash p;
 
-		p = PerfectHash.chooseKeys(1, map.keySet());
-		if(p == null) {
+		if((p = gethash(map.keySet(), columns, pluslen)) == null) {
 			return false;
 		}
 		hf.printLicense(wr, license);

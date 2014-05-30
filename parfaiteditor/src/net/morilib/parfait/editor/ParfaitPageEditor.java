@@ -134,26 +134,35 @@ public class ParfaitPageEditor extends FormEditor {
 		IMarker m;
 		String n;
 
-		p = new PrintWriter(new OutputStreamWriter(bot), true);
-		n = g.getName().replaceFirst("\\.[^\\.]+$", "");
-		if(keywords.getKeywordList().size() == 0) {
-			m = f.createMarker(IMarker.PROBLEM);
-			m.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-			m.setAttribute(IMarker.MESSAGE, "There are no keywords");
-		} else if(ConvertToTargetFile.output(hf, p, n, this)) {
-			p.close();
-			bin = new ByteArrayInputStream(bot.toByteArray());
-			if(g.exists()) {
-				g.setContents(bin, true, false, mon);
+		try {
+			p = new PrintWriter(new OutputStreamWriter(bot), true);
+			n = g.getName().replaceFirst("\\.[^\\.]+$", "");
+			if(keywords.getKeywordList().size() == 0) {
+				m = f.createMarker(IMarker.PROBLEM);
+				m.setAttribute(IMarker.SEVERITY,
+						IMarker.SEVERITY_ERROR);
+				m.setAttribute(IMarker.MESSAGE,
+						"There are no keywords");
+			} else if(ConvertToTargetFile.output(hf, p, n, this)) {
+				p.close();
+				bin = new ByteArrayInputStream(bot.toByteArray());
+				if(g.exists()) {
+					g.setContents(bin, true, false, mon);
+				} else {
+					g.create(bin, true, mon);
+				}
 			} else {
-				g.create(bin, true, mon);
+				p.close();
+				m = f.createMarker(IMarker.PROBLEM);
+				m.setAttribute(IMarker.SEVERITY,
+						IMarker.SEVERITY_ERROR);
+				m.setAttribute(IMarker.MESSAGE,
+						"Collision of the hash value has occured");
 			}
-		} else {
-			p.close();
+		} catch(IllegalArgumentException e) {
 			m = f.createMarker(IMarker.PROBLEM);
 			m.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-			m.setAttribute(IMarker.MESSAGE,
-					"Collision of the hash value has occured");
+			m.setAttribute(IMarker.MESSAGE, "Invalid hash comptation");
 		}
 	}
 

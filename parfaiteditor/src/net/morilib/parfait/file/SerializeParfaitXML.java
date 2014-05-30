@@ -78,6 +78,13 @@ public final class SerializeParfaitXML {
 				esc(oe.getType()));
 		pw.printf("<default-action>%s</default-action>\n",
 				esc(oe.getDefaultAction()));
+		pw.println("<compute-hash>");
+		pw.printf("<auto>%s</auto>\n",
+				oe.isAutomatically() ? "true" : "false");
+		pw.printf("<columns>%s</columns>\n", esc(oe.getColumns()));
+		pw.printf("<pluslength>%s</pluslength>\n",
+				oe.isPlusLength() ? "true" : "false");
+		pw.println("</compute-hash>");
 
 		pw.println("<keywords>");
 		for(KeywordBean t : editor.getKeywords().getKeywordList()) {

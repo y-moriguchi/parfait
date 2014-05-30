@@ -41,7 +41,8 @@ public class ParfaitBean {
 	KeywordsBean keywords = new KeywordsBean();
 	DescriptionBean description = new DescriptionBean();
 	AuxiliaryCodeBean auxiliary = new AuxiliaryCodeBean();
-	String functionType = R_DEFAULT, defaultAction;
+	String functionType = R_DEFAULT, defaultAction, columns;
+	boolean automatically = true, plusLength = false;
 
 	/**
 	 * 
@@ -81,6 +82,30 @@ public class ParfaitBean {
 	 */
 	public String getDefaultAction() {
 		return defaultAction;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getColumns() {
+		return columns;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isAutomatically() {
+		return automatically;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isPlusLength() {
+		return plusLength;
 	}
 
 }

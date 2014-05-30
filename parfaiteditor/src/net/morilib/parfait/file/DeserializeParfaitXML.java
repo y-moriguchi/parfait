@@ -159,6 +159,25 @@ public final class DeserializeParfaitXML {
 	}
 
 	//
+	void readHashComp(ParfaitBean db, Node np) {
+		NodeList nl;
+		Node nd;
+
+		nl = np.getChildNodes();
+		for(int k = 0; k < nl.getLength(); k++) {
+			nd = nl.item(k);
+			if(nd.getNodeName().equals("columns")) {
+				db.columns = readTextNode(nd).trim();
+			} else if(nd.getNodeName().equals("pluslength")) {
+				db.plusLength = readTextNode(nd).trim().equals("true");
+			} else if(nd.getNodeName().equals("auto")) {
+				db.automatically =
+						readTextNode(nd).trim().equals("true");
+			}
+		}
+	}
+
+	//
 	ParfaitBean read(Document doc) {
 		ParfaitBean mb = new ParfaitBean();
 		NodeList nl;
@@ -171,6 +190,8 @@ public final class DeserializeParfaitXML {
 				mb.functionType = readTextNode(nd).trim();
 			} else if(nd.getNodeName().equals("default-action")) {
 				mb.defaultAction = readTextNode(nd).trim();
+			} else if(nd.getNodeName().equals("compute-hash")) {
+				readHashComp(mb, nd);
 			} else if(nd.getNodeName().equals("keywords")) {
 				mb.keywords = readKeywords(nd);
 			} else if(nd.getNodeName().equals("description")) {

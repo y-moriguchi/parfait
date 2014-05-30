@@ -31,6 +31,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
@@ -46,11 +47,15 @@ public class OptionsEditor extends FormPage {
 	//
 	Text defaultAction;
 	Button rAction, rLookup, rMap;
+	Button cAuto;
+	Text columns;
+	Combo pluslen;
 
 	//
 	private ParfaitPageEditor editor;
 	private boolean dirty = false;
-	private String olddef, oldtyp;
+	private String olddef, oldtyp, oldcol;
+	private boolean oldaut, oldlen;
 
 	/**
 	 * 
@@ -121,6 +126,31 @@ public class OptionsEditor extends FormPage {
 		}
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isAutomatically() {
+		return cAuto != null ? cAuto.getSelection() : oldaut;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getColumns() {
+		return columns != null ? columns.getText() : oldcol;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isPlusLength() {
+		return pluslen != null ?
+				pluslen.getSelectionIndex() == 1 : oldlen;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormPage#isDirty()
 	 */
@@ -145,7 +175,7 @@ public class OptionsEditor extends FormPage {
 		ScrolledForm form = managedForm.getForm();
 		FormToolkit tk = managedForm.getToolkit();
 		GridLayout gl = new GridLayout(1, false);
-		Composite ct = form.getBody(), cm;
+		Composite ct = form.getBody(), cm, cn;
 		SelectionAdapter ap;
 		GridData gd;
 		Section sc;
@@ -194,7 +224,6 @@ public class OptionsEditor extends FormPage {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		defaultAction.setLayoutData(gd);
-		defaultAction.setLayoutData(gd);
 		if(olddef != null) {
 			defaultAction.setText(olddef);
 		} else {
@@ -213,6 +242,74 @@ public class OptionsEditor extends FormPage {
 
 		});
 
+		tk.createLabel(cm, "Columns");
+		cAuto = tk.createButton(cm, "Decide Automatically", SWT.CHECK);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		cAuto.setLayoutData(gd);
+		cAuto.setSelection(oldaut);
+		cAuto.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(!dirty && oldaut != cAuto.getSelection()) {
+					dirty = true;
+					editor.editorDirtyStateChanged();
+				}
+				columns.setEnabled(!cAuto.getSelection());
+				pluslen.setEnabled(!cAuto.getSelection());
+			}
+
+		});
+
+		tk.createLabel(cm, "");
+		cn = tk.createComposite(cm);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		cn.setLayoutData(gd);
+		cn.setLayout(new GridLayout(4, false));
+		tk.createLabel(cn, "hash = string[");
+		columns = tk.createText(cn, "");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.widthHint = 110;
+		columns.setLayoutData(gd);
+		if(oldcol != null) {
+			columns.setText(oldcol);
+		} else {
+			oldcol = "";
+		}
+		columns.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if(dirty) {
+					// do nothing
+				} else if(dirty = !oldcol.equals(e.data)) {
+					editor.editorDirtyStateChanged();
+				}
+			}
+
+		});
+		tk.createLabel(cn, "] +");
+		pluslen = new Combo(cn, SWT.READ_ONLY | SWT.BORDER);
+		pluslen.add("0");
+		pluslen.add("length");
+		pluslen.select(oldlen ? 1 : 0);
+		pluslen.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if(dirty) {
+					// do nothing
+				} else if(dirty = (oldlen !=
+						(pluslen.getSelectionIndex() == 1))) {
+					editor.editorDirtyStateChanged();
+				}
+			}
+
+		});
+		columns.setEnabled(!oldaut);
+		pluslen.setEnabled(!oldaut);
 		sc.setClient(cm);
 	}
 
@@ -220,6 +317,9 @@ public class OptionsEditor extends FormPage {
 	private void loadFragment(ParfaitBean act) {
 		olddef = act.getDefaultAction();
 		oldtyp = act.getFunctionType();
+		oldaut = act.isAutomatically();
+		oldcol = act.getColumns();
+		oldlen = act.isPlusLength();
 	}
 
 	/* (non-Javadoc)

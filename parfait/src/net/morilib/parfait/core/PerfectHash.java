@@ -205,7 +205,8 @@ public class PerfectHash {
 
 	/**
 	 * 
-	 * @param l
+	 * @param add
+	 * @param keys
 	 * @return
 	 */
 	public static PerfectHash chooseKeys(int add,
@@ -252,6 +253,53 @@ public class PerfectHash {
 			}
 		} while((p = p.nextAll()) != null);
 		return null;
+	}
+
+	/**
+	 * 
+	 * @param add
+	 * @param perm
+	 * @param pluslen
+	 * @param keys
+	 * @return
+	 */
+	public static PerfectHash chooseKeys(int add,
+			PermutationInclementor p, boolean pluslen,
+			Iterable<String> keys) {
+		SortedSet<MyChar> c = new TreeSet<MyChar>();
+		SortedSet<MyChar> b = new TreeSet<MyChar>();
+		KeysigStatistics<MyChar> r;
+		MyCharacterSet<MyChar> t;
+		List<Keysig<MyChar>> l;
+		int m = Integer.MAX_VALUE, x = -1;
+		boolean f;
+
+		for(String s : keys) {
+			m = m > s.length() ? s.length() : m;
+			x = x < s.length() ? s.length() : x;
+			for(int k = 0; k < s.length(); k++) {
+				c.add(MyChar.valueOf(s.charAt(k)));
+				b.add(MyChar.valueOf((char)(s.charAt(k) & 0xff)));
+				b.add(MyChar.valueOf((char)(s.charAt(k) >> 8)));
+			}
+		}
+
+		f = c.last().isASCII();
+		c = f ? c : b;
+		l = new ArrayList<Keysig<MyChar>>();
+		if(f) {
+			for(String s : keys)  l.add(p.pickCharacter(s));
+		} else {
+			for(String s : keys)  l.add(p.pickByte(s));
+		}
+
+		t = new MyCharacterSet<MyChar>(l);
+		r = KeysigStatistics.compute(t, l, add, false, pluslen);
+		if(r != null) {
+			return new PerfectHash(c, r, p, x, m, pluslen);
+		} else {
+			return null;
+		}
 	}
 
 }

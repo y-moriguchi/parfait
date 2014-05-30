@@ -23,8 +23,9 @@ public final class ConvertToTargetFile {
 	 */
 	public static boolean output(HashFormatter hf, PrintWriter wr,
 			String name, ParfaitPageEditor ed) {
-		String license, defAction, prologue, desc, aux;
+		String license, defAction, prologue, desc, aux, col;
 		Map<String, String> map;
+		boolean plen;
 
 		map = new LinkedHashMap<String, String>();
 		for(KeywordBean k : ed.getKeywords().getKeywordList()) {
@@ -35,16 +36,24 @@ public final class ConvertToTargetFile {
 		prologue  = ed.getAuxiliary().getDefinition();
 		desc      = ed.getDescription().getDescription();
 		aux       = ed.getAuxiliary().getAuxiliary();
+		if(ed.getOptions().isAutomatically()) {
+			col  = null;
+			plen = false;
+		} else {
+			col  = ed.getOptions().getColumns();
+			plen = ed.getOptions().isPlusLength();
+		}
 
 		if(ed.getOptions().isAction()) {
-			return PerfectHashOutput.printExecute(wr, hf, name, map,
-					defAction, license, prologue, desc, aux);
+			return PerfectHashOutput.printExecute(wr, hf, col, plen,
+					name, map, defAction, license, prologue, desc,
+					aux);
 		} else if(ed.getOptions().isLookup()) {
-			return PerfectHashOutput.printLookup(wr, hf, name,
-					map.keySet(), license, prologue, desc, aux);
+			return PerfectHashOutput.printLookup(wr, hf, col, plen,
+					name, map.keySet(), license, prologue, desc, aux);
 		} else if(ed.getOptions().isMap()) {
-			return PerfectHashOutput.printMap(wr, hf, name, map,
-					license, prologue, desc, aux);
+			return PerfectHashOutput.printMap(wr, hf, col, plen, name,
+					map, license, prologue, desc, aux);
 		} else {
 			throw new RuntimeException();
 		}

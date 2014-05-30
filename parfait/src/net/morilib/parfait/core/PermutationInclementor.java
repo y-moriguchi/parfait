@@ -16,7 +16,9 @@
 package net.morilib.parfait.core;
 
 import java.util.Iterator;
+import java.util.SortedSet;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import net.morilib.parfait.misc.MyChar;
 import net.morilib.parfait.misc.TinySortedBag;
@@ -58,6 +60,53 @@ implements Iterable<Integer>, Cloneable {
 		}
 		length = max;
 		value  = len;
+	}
+
+	/**
+	 * 
+	 * @param s
+	 * @param max
+	 * @return
+	 */
+	public static PermutationInclementor newInstance(String s,
+			int max) {
+		PermutationInclementor p, q = null;
+		SortedSet<Integer> t;
+		String[] a;
+		Integer x;
+
+		a = s.split(",");
+		t = new TreeSet<Integer>(new java.util.Comparator<Integer>() {
+
+			@Override
+			public int compare(Integer a, Integer b) {
+				return PermutationInclementor.compare(a.intValue(),
+						b.intValue());
+			}
+
+		});
+
+		for(String v : a) {
+			x = Integer.valueOf(v);
+			if(compare(x.intValue(), max) >= 0) {
+				throw new IllegalArgumentException();
+			}
+			t.add(x);
+		}
+
+		p = new PermutationInclementor(max);
+		for(Integer v : t) {
+			q = new PermutationInclementor();
+			q.basis  = p;
+			q.length = max;
+			q.value  = v.intValue();
+			p = q;
+		}
+
+		if(q == null) {
+			throw new IllegalArgumentException();
+		}
+		return q;
 	}
 
 	//
