@@ -15,7 +15,16 @@
  */
 package net.morilib.parfait.wizard;
 
-import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+
+import net.morilib.parser.csv.CSVConfig;
+import net.morilib.parser.csv.StringCSVPullParser;
+import net.morilib.util.encoding.EncodingDetectorFactory;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -35,8 +44,9 @@ import org.eclipse.swt.widgets.Text;
 public class ParfaitImportWizardPage extends WizardPage {
 
 	//
+	ParfaitImportWizardPage2 page2;
 	Combo encoding;
-	Text filename, keycolumn, mapcolumn;
+	Text filename;
 
 	/**
 	 * 
@@ -47,7 +57,31 @@ public class ParfaitImportWizardPage extends WizardPage {
 	}
 
 	//
-	private static final Pattern NUM = Pattern.compile("[0-9]+");
+	StringCSVPullParser getCSVParser() throws IOException {
+		BufferedReader rd;
+		CSVConfig cc;
+		String fn, en;
+		Charset cs;
+		File fl;
+
+		fn = filename.getText();
+		en = encoding.getText();
+		if(fn != null) {
+			fl = new File(fn);
+		} else {
+			throw new IllegalStateException();
+		}
+
+		if(en == null || en.equals("") || en.charAt(0) == '(') {
+			cs = EncodingDetectorFactory.getInstance().detect(fl);
+		} else {
+			cs = Charset.forName(en);
+		}
+		rd = new BufferedReader(new InputStreamReader(
+				new FileInputStream(fl), cs));
+		cc = new CSVConfig(",", '"', false);
+		return new StringCSVPullParser(rd, cc);
+	};
 
 	//
 	private void doValidate() {
@@ -56,23 +90,21 @@ public class ParfaitImportWizardPage extends WizardPage {
 		if((s = filename.getText()) == null || s.equals("")) {
 			setErrorMessage("Filename must not be empty.");
 			setPageComplete(false);
-		} else if((s = keycolumn.getText()) == null || s.equals("")) {
-			setErrorMessage("Keyword column must not be empty.");
-			setPageComplete(false);
-		} else if(!NUM.matcher(s).matches()) {
-			setErrorMessage("Keyword column must be positive integer.");
-			setPageComplete(false);
-		} else if(Integer.parseInt(s) == 0) {
-			setErrorMessage("Keyword column must be positive integer.");
-			setPageComplete(false);
-		} else if((s = mapcolumn.getText()) != null && !s.equals("") &&
-				(!NUM.matcher(s).matches() || Integer.parseInt(s) == 0)) {
-			setErrorMessage("Action column must be positive integer.");
+		} else if((s = page2.changeheader()) != null) {
+			setErrorMessage(s);
 			setPageComplete(false);
 		} else {
 			setErrorMessage(null);
 			setPageComplete(true);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.WizardPage#canFlipToNextPage()
+	 */
+	@Override
+	public boolean canFlipToNextPage() {
+		return getErrorMessage() == null;
 	}
 
 	/* (non-Javadoc)
@@ -96,6 +128,7 @@ public class ParfaitImportWizardPage extends WizardPage {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				doValidate();
+				getWizard().getContainer().updateButtons();
 			}
 
 		});
@@ -112,6 +145,8 @@ public class ParfaitImportWizardPage extends WizardPage {
 				if((s = fd.open()) != null) {
 					filename.setText(s);
 				}
+				doValidate();
+				getWizard().getContainer().updateButtons();
 			}
 
 		});
@@ -128,39 +163,6 @@ public class ParfaitImportWizardPage extends WizardPage {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		encoding.setLayoutData(gd);
-
-		lb = new Label(cm, SWT.NULL);
-		lb.setText("Keyword column");
-		keycolumn = new Text(cm, SWT.BORDER);
-		keycolumn.setText("1");
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		gd.widthHint = 50;
-		keycolumn.setLayoutData(gd);
-		keycolumn.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				doValidate();
-			}
-
-		});
-
-		lb = new Label(cm, SWT.NULL);
-		lb.setText("Action(Map) column");
-		mapcolumn = new Text(cm, SWT.BORDER);
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		gd.widthHint = 50;
-		mapcolumn.setLayoutData(gd);
-		mapcolumn.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				doValidate();
-			}
-
-		});
 
 		doValidate();
 		setControl(cm);

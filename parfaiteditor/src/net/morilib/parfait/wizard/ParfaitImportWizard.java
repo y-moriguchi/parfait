@@ -15,19 +15,12 @@
  */
 package net.morilib.parfait.wizard;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 
 import net.morilib.parfait.editor.ParfaitKeywordsEditor;
 import net.morilib.parfait.file.KeywordBean;
-import net.morilib.parser.csv.CSVConfig;
 import net.morilib.parser.csv.CSVException;
 import net.morilib.parser.csv.StringCSVPullParser;
-import net.morilib.util.encoding.EncodingDetectorFactory;
 
 import org.eclipse.jface.wizard.Wizard;
 
@@ -36,6 +29,7 @@ public class ParfaitImportWizard extends Wizard {
 	//
 	private ParfaitKeywordsEditor editor;
 	private ParfaitImportWizardPage page1;
+	private ParfaitImportWizardPage2 page2;
 
 	/**
 	 * 
@@ -50,46 +44,35 @@ public class ParfaitImportWizard extends Wizard {
 	 */
 	public void addPages() {
 		addPage(page1 = new ParfaitImportWizardPage());
+		addPage(page2 = new ParfaitImportWizardPage2(page1));
+		page1.page2 = page2;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
+	 */
 	@Override
 	public boolean performFinish() {
-		BufferedReader rd = null;
-		StringCSVPullParser cv;
+		StringCSVPullParser cv = null;
 		KeywordBean kb;
-		String fn, en;
-		CSVConfig cc;
 		String[] ar;
-		Charset cs;
 		int kw, aw;
-		File fl;
-
-		fn = page1.filename.getText();
-		en = page1.encoding.getText();
-		kw = Integer.parseInt(page1.keycolumn.getText()) - 1;
-		aw = Integer.parseInt(page1.mapcolumn.getText()) - 1;
-		if(fn == null || fn.equals("")) {
-			return true;
-		} else {
-			fl = new File(fn);
-		}
 
 		try {
-			if(en == null || en.equals("") || en.charAt(0) == '(') {
-				cs = EncodingDetectorFactory.getInstance().detect(fl);
-			} else {
-				cs = Charset.forName(en);
+			kw = page2.keycolumn.getSelectionIndex();
+			aw = page2.mapcolumn.getSelectionIndex();
+			cv = page1.getCSVParser();
+			if(page2.isheader.getSelection()) {
+				cv.next();
 			}
-			rd = new BufferedReader(new InputStreamReader(
-					new FileInputStream(fl), cs));
-			cc = new CSVConfig(",", '"', false);
-			cv = new StringCSVPullParser(rd, cc);
+
 			while(cv.next()) {
 				ar = cv.get();
 				if(ar.length > kw) {
 					kb = new KeywordBean();
 					kb.setKeyword(ar[kw]);
-					if(ar.length > aw) {
+					if(page2.isusemap.getSelection() &&
+							ar.length > aw) {
 						kb.setAction(ar[aw]);
 					}
 					editor.addKeyword(kb);
@@ -101,10 +84,8 @@ public class ParfaitImportWizard extends Wizard {
 		} catch(CSVException e) {
 			return false;
 		} finally {
-			try {
-				if(rd != null)  rd.close();
-			} catch (IOException e) {
-				return false;
+			if(cv != null) {
+				cv.close();
 			}
 		}
 	}

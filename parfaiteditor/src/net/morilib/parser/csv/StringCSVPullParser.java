@@ -15,6 +15,7 @@
  */
 package net.morilib.parser.csv;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import java.util.NoSuchElementException;
  * @author MORIGUCHI, Yuichiro 2010/09/18
  */
 public final class StringCSVPullParser
-implements CSVPullParser<String[]> {
+implements CSVPullParser<String[]>, Closeable {
 
 	//
 	private class Hndl implements CSVHandler {
@@ -141,6 +142,20 @@ implements CSVPullParser<String[]> {
 				return false;
 			} else {
 				return true;
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.Closeable#close()
+	 */
+	@Override
+	public void close() {
+		if(stream != null) {
+			try {
+				stream.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}
