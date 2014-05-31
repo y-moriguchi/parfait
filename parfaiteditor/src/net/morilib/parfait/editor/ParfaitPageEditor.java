@@ -23,7 +23,9 @@ import java.io.PrintWriter;
 import net.morilib.parfait.file.ConvertToTargetFile;
 import net.morilib.parfait.file.SerializeParfaitXML;
 import net.morilib.parfait.translate.HashFormatter;
-import net.morilib.parfait.translate.JavaHashFormatter;
+import net.morilib.parfait.translate.JavaExecuteHashFormatter;
+import net.morilib.parfait.translate.JavaMapHashFormatter;
+import net.morilib.parfait.translate.JavaValidateHashFormatter;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -166,10 +168,26 @@ public class ParfaitPageEditor extends FormEditor {
 		}
 	}
 
+	
+	public HashFormatter getHashFormatter() {
+		if(options.isAction()) {
+			return new JavaExecuteHashFormatter();
+		} else if(options.isLookup()) {
+			return new JavaValidateHashFormatter();
+		} else if(options.isMap()) {
+			return new JavaMapHashFormatter();
+		} else {
+			throw new RuntimeException();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void doSave(IProgressMonitor mon) {
 		ByteArrayOutputStream bot = new ByteArrayOutputStream();
-		HashFormatter hf = new JavaHashFormatter();
+		HashFormatter hf = getHashFormatter();
 		IFile f = null;
 
 		try {
@@ -190,6 +208,9 @@ public class ParfaitPageEditor extends FormEditor {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
+	 */
 	@Override
 	public void doSaveAs() {
 		WorkspaceModifyOperation op;
@@ -211,7 +232,7 @@ public class ParfaitPageEditor extends FormEditor {
 
 			public void execute(
 					final IProgressMonitor mon) throws CoreException {
-				HashFormatter hf = new JavaHashFormatter();
+				HashFormatter hf = getHashFormatter();
 				ByteArrayOutputStream b;
 
 				try {

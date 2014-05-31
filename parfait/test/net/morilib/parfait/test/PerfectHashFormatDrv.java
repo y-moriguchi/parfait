@@ -21,14 +21,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.morilib.parfait.core.PerfectHash;
-import net.morilib.parfait.translate.HashFormatter;
-import net.morilib.parfait.translate.JavaHashFormatter;
+import net.morilib.parfait.translate.JavaHashFormatterUtils;
 
 public class PerfectHashFormatDrv {
 
 	public static void main(String[] args) {
 		PrintWriter wr;
-		HashFormatter hf;
 		PerfectHash p;
 		Map<String, String> l;
 
@@ -47,18 +45,17 @@ public class PerfectHashFormatDrv {
 		l.put("december",  "return \"DEC\";");
 		p = PerfectHash.chooseKeys(1, l.keySet());
 
-		hf = new JavaHashFormatter();
 		wr = new PrintWriter(new OutputStreamWriter(System.out), true);
-		hf.printLicense(wr, "");
-		hf.printPrologue(wr, "");
-		hf.printClassDefinition(wr, "TestHash");
-		hf.printEnum(wr, p);
-		hf.printAssoValues(wr, p);
-		hf.printWordlist(wr, p, l.keySet());
-		hf.printHashFunction(wr, p);
-		hf.printLookupFunction(wr, p);
-		hf.printExecuteFunction(wr, p, l, null);
-		hf.printClassEpilogue(wr);
+		JavaHashFormatterUtils.printLicense(wr, "");
+		JavaHashFormatterUtils.printPrologue(wr, "");
+		JavaHashFormatterUtils.printClassDefinition(wr, "TestHash");
+		JavaHashFormatterUtils.printEnum(wr, p);
+		JavaHashFormatterUtils.printAssoValues(wr, p);
+		JavaHashFormatterUtils.printWordlist(wr, p, l.keySet());
+		JavaHashFormatterUtils.printHashFunction(wr, p);
+		JavaHashFormatterUtils.printLookupFunction(wr, p);
+		JavaHashFormatterUtils.printExecuteFunction(wr, p, l, null);
+		JavaHashFormatterUtils.printClassEpilogue(wr);
 	}
 
 }

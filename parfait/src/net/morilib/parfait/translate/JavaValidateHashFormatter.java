@@ -18,34 +18,44 @@ package net.morilib.parfait.translate;
 import java.io.PrintWriter;
 import java.util.Map;
 
-public interface HashFormatter {
+import net.morilib.parfait.core.PerfectHash;
+
+public class JavaValidateHashFormatter extends JavaHashFormatter {
 
 	/**
 	 * 
 	 * @param wr
 	 * @param hf
-	 * @param columns
-	 * @param pluslen
 	 * @param name
 	 * @param map
 	 * @param defaultAction
 	 * @param license
 	 * @param prologue
-	 * @param desc
-	 * @param aux
 	 * @return
 	 */
 	public boolean print(PrintWriter wr,
 			HashFormatter hf, String columns, boolean pluslen,
 			String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
-			String desc, String aux);
+			String desc, String aux) {
+		PerfectHash p;
 
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public String getTargetFilename(String s);
+		if((p = JavaHashFormatterUtils.gethash(
+				map.keySet(), columns, pluslen)) == null) {
+			return false;
+		}
+		JavaHashFormatterUtils.printLicense(wr, license);
+		JavaHashFormatterUtils.printPrologue(wr, prologue);
+		JavaHashFormatterUtils.printDescription(wr, desc);
+		JavaHashFormatterUtils.printClassDefinition(wr, name);
+		JavaHashFormatterUtils.printEnum(wr, p);
+		JavaHashFormatterUtils.printAssoValues(wr, p);
+		JavaHashFormatterUtils.printWordlist(wr, p, map.keySet());
+		JavaHashFormatterUtils.printHashFunction(wr, p);
+		JavaHashFormatterUtils.printLookupFunction(wr, p);
+		JavaHashFormatterUtils.printAuxiliary(wr, aux);
+		JavaHashFormatterUtils.printClassEpilogue(wr);
+		return true;
+	}
 
 }

@@ -74,6 +74,8 @@ public final class SerializeParfaitXML {
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		pw.println("<parfait>");
 
+		pw.printf("<target-language>%s</target-language>\n",
+				esc(oe.getLanguage()));
 		pw.printf("<function-type>%s</function-type>\n",
 				esc(oe.getType()));
 		pw.printf("<default-action>%s</default-action>\n",

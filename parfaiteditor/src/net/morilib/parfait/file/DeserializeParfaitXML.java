@@ -186,7 +186,9 @@ public final class DeserializeParfaitXML {
 		nl = doc.getChildNodes().item(0).getChildNodes();
 		for(int k = 0; k < nl.getLength(); k++) {
 			nd = nl.item(k);
-			if(nd.getNodeName().equals("function-type")) {
+			if(nd.getNodeName().equals("target-language")) {
+				mb.language = readTextNode(nd).trim();
+			} else if(nd.getNodeName().equals("function-type")) {
 				mb.functionType = readTextNode(nd).trim();
 			} else if(nd.getNodeName().equals("default-action")) {
 				mb.defaultAction = readTextNode(nd).trim();

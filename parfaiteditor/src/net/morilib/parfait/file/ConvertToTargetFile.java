@@ -6,7 +6,6 @@ import java.util.Map;
 
 import net.morilib.parfait.editor.ParfaitPageEditor;
 import net.morilib.parfait.translate.HashFormatter;
-import net.morilib.parfait.translate.PerfectHashOutput;
 
 public final class ConvertToTargetFile {
 
@@ -43,20 +42,9 @@ public final class ConvertToTargetFile {
 			col  = ed.getOptions().getColumns();
 			plen = ed.getOptions().isPlusLength();
 		}
-
-		if(ed.getOptions().isAction()) {
-			return PerfectHashOutput.printExecute(wr, hf, col, plen,
-					name, map, defAction, license, prologue, desc,
-					aux);
-		} else if(ed.getOptions().isLookup()) {
-			return PerfectHashOutput.printLookup(wr, hf, col, plen,
-					name, map.keySet(), license, prologue, desc, aux);
-		} else if(ed.getOptions().isMap()) {
-			return PerfectHashOutput.printMap(wr, hf, col, plen, name,
-					map, license, prologue, desc, aux);
-		} else {
-			throw new RuntimeException();
-		}
+		return hf.print(wr, hf, col, plen,
+				name, map, defAction, license, prologue, desc,
+				aux);
 	}
 
 }

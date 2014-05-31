@@ -46,7 +46,7 @@ public class OptionsEditor extends FormPage {
 
 	//
 	Text defaultAction;
-	Button rAction, rLookup, rMap;
+	Combo language, functype;
 	Button cAuto;
 	Text columns;
 	Combo pluslen;
@@ -54,7 +54,7 @@ public class OptionsEditor extends FormPage {
 	//
 	private ParfaitPageEditor editor;
 	private boolean dirty = false;
-	private String olddef, oldtyp, oldcol;
+	private String oldlan, olddef, oldtyp, oldcol;
 	private boolean oldaut, oldlen;
 
 	/**
@@ -78,17 +78,24 @@ public class OptionsEditor extends FormPage {
 	 * 
 	 * @return
 	 */
+	public String getLanguage() {
+		return language != null ? language.getText() : oldlan;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public String getType() {
-		if(rAction == null) {
+		if(functype == null) {
 			return oldtyp;
-		} else if(rAction.getSelection()) {
-			return ParfaitBean.R_ACTION;
-		} else if(rLookup.getSelection()) {
-			return ParfaitBean.R_LOOKUP;
-		} else if(rMap.getSelection()) {
-			return ParfaitBean.R_MAP;
 		} else {
-			return ParfaitBean.R_DEFAULT;
+			switch(functype.getSelectionIndex()) {
+			case 0:   return ParfaitBean.R_ACTION;
+			case 1:   return ParfaitBean.R_MAP;
+			case 2:   return ParfaitBean.R_LOOKUP;
+			default:  return ParfaitBean.R_DEFAULT;
+			}
 		}
 	}
 
@@ -176,7 +183,6 @@ public class OptionsEditor extends FormPage {
 		FormToolkit tk = managedForm.getToolkit();
 		GridLayout gl = new GridLayout(1, false);
 		Composite ct = form.getBody(), cm, cn;
-		SelectionAdapter ap;
 		GridData gd;
 		Section sc;
 
@@ -188,25 +194,31 @@ public class OptionsEditor extends FormPage {
 		sc.setText("Options");
 		sc.setLayoutData(new GridData(GridData.FILL_BOTH));
 		cm = tk.createComposite(sc);
-		cm.setLayout(new GridLayout(4, false));
+		cm.setLayout(new GridLayout(2, false));
+
+		tk.createLabel(cm, "Target language");
+		language = new Combo(cm, SWT.BORDER | SWT.READ_ONLY);
+		language.add("Java");
+		language.select(0);
 
 		tk.createLabel(cm, "Function Type");
-		rAction = tk.createButton(cm, "Action", SWT.RADIO);
-		rLookup = tk.createButton(cm, "Lookup", SWT.RADIO);
-		rMap    = tk.createButton(cm, "Map", SWT.RADIO);
+		functype = new Combo(cm, SWT.BORDER | SWT.READ_ONLY);
+		functype.add("Execute corresponding actions");
+		functype.add("Return corresponding values");
+		functype.add("Validate only");
 		if(oldtyp == null) {
 			olddef = "";
 		} else if(oldtyp.equals(ParfaitBean.R_ACTION)) {
-			rAction.setSelection(true);
-		} else if(oldtyp.equals(ParfaitBean.R_LOOKUP)) {
-			rLookup.setSelection(true);
+			functype.select(0);
 		} else if(oldtyp.equals(ParfaitBean.R_MAP)) {
-			rMap.setSelection(true);
+			functype.select(1);
+		} else if(oldtyp.equals(ParfaitBean.R_LOOKUP)) {
+			functype.select(2);
 		}
-		ap = new SelectionAdapter() {
+		functype.addModifyListener(new ModifyListener() {
 
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void modifyText(ModifyEvent e) {
 				if(dirty) {
 					// do nothing
 				} else if(dirty = !olddef.equals(getType())) {
@@ -214,15 +226,11 @@ public class OptionsEditor extends FormPage {
 				}
 			}
 
-		};
-		rAction.addSelectionListener(ap);
-		rLookup.addSelectionListener(ap);
-		rMap.addSelectionListener(ap);
+		});
 
 		tk.createLabel(cm, "Default Action");
 		defaultAction = tk.createText(cm, "");
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 3;
 		defaultAction.setLayoutData(gd);
 		if(olddef != null) {
 			defaultAction.setText(olddef);
@@ -245,7 +253,6 @@ public class OptionsEditor extends FormPage {
 		tk.createLabel(cm, "Columns");
 		cAuto = tk.createButton(cm, "Decide Automatically", SWT.CHECK);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 3;
 		cAuto.setLayoutData(gd);
 		cAuto.setSelection(oldaut);
 		cAuto.addSelectionListener(new SelectionAdapter() {
@@ -264,9 +271,6 @@ public class OptionsEditor extends FormPage {
 
 		tk.createLabel(cm, "");
 		cn = tk.createComposite(cm);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 3;
-		cn.setLayoutData(gd);
 		cn.setLayout(new GridLayout(4, false));
 		tk.createLabel(cn, "hash = string[");
 		columns = tk.createText(cn, "");
@@ -315,6 +319,7 @@ public class OptionsEditor extends FormPage {
 
 	//
 	private void loadFragment(ParfaitBean act) {
+		oldlan = act.getLanguage();
 		olddef = act.getDefaultAction();
 		oldtyp = act.getFunctionType();
 		oldaut = act.isAutomatically();

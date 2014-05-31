@@ -41,6 +41,7 @@ public class ParfaitBean {
 	KeywordsBean keywords = new KeywordsBean();
 	DescriptionBean description = new DescriptionBean();
 	AuxiliaryCodeBean auxiliary = new AuxiliaryCodeBean();
+	String language = "Java";
 	String functionType = R_DEFAULT, defaultAction, columns;
 	boolean automatically = true, plusLength = false;
 
@@ -66,6 +67,14 @@ public class ParfaitBean {
 	 */
 	public AuxiliaryCodeBean getAuxiliary() {
 		return auxiliary;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getLanguage() {
+		return language;
 	}
 
 	/**
