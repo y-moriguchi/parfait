@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import net.morilib.parfait.file.ConvertToTargetFile;
 import net.morilib.parfait.file.SerializeParfaitXML;
 import net.morilib.parfait.translate.HashFormatter;
+import net.morilib.parfait.translate.JavaEnumHashFormatter;
 import net.morilib.parfait.translate.JavaExecuteHashFormatter;
 import net.morilib.parfait.translate.JavaMapHashFormatter;
 import net.morilib.parfait.translate.JavaValidateHashFormatter;
@@ -174,6 +175,8 @@ public class ParfaitPageEditor extends FormEditor {
 			return new JavaExecuteHashFormatter();
 		} else if(options.isLookup()) {
 			return new JavaValidateHashFormatter();
+		} else if(options.isEnum()) {
+			return new JavaEnumHashFormatter();
 		} else if(options.isMap()) {
 			return new JavaMapHashFormatter();
 		} else {

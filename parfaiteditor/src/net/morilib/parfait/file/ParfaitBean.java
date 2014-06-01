@@ -35,6 +35,11 @@ public class ParfaitBean {
 	/**
 	 * 
 	 */
+	public static final String R_ENUM    = "enum";
+
+	/**
+	 * 
+	 */
 	public static final String R_DEFAULT = R_ACTION;
 
 	//

@@ -45,6 +45,18 @@ import org.eclipse.ui.forms.widgets.Section;
 public class OptionsEditor extends FormPage {
 
 	//
+	private static final int C_EXECUTE = 0;
+	private static final int C_MAP     = 1;
+	private static final int C_ENUM    = 2;
+	private static final int C_ONLY    = 3;
+	private static final String[] C_MESG = new String[] {
+		"Execute corresponding actions",
+		"Return corresponding values",
+		"Type-safe enum",
+		"Validate only",
+	};
+
+	//
 	Text defaultAction;
 	Combo language, functype;
 	Button cAuto;
@@ -91,10 +103,11 @@ public class OptionsEditor extends FormPage {
 			return oldtyp;
 		} else {
 			switch(functype.getSelectionIndex()) {
-			case 0:   return ParfaitBean.R_ACTION;
-			case 1:   return ParfaitBean.R_MAP;
-			case 2:   return ParfaitBean.R_LOOKUP;
-			default:  return ParfaitBean.R_DEFAULT;
+			case C_EXECUTE:  return ParfaitBean.R_ACTION;
+			case C_MAP:      return ParfaitBean.R_MAP;
+			case C_ENUM:     return ParfaitBean.R_ENUM;
+			case C_ONLY:     return ParfaitBean.R_LOOKUP;
+			default:         return ParfaitBean.R_DEFAULT;
 			}
 		}
 	}
@@ -121,6 +134,14 @@ public class OptionsEditor extends FormPage {
 	 */
 	public boolean isMap() {
 		return ParfaitBean.R_MAP.equals(getType());
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isEnum() {
+		return ParfaitBean.R_ENUM.equals(getType());
 	}
 
 	//
@@ -203,17 +224,20 @@ public class OptionsEditor extends FormPage {
 
 		tk.createLabel(cm, "Function Type");
 		functype = new Combo(cm, SWT.BORDER | SWT.READ_ONLY);
-		functype.add("Execute corresponding actions");
-		functype.add("Return corresponding values");
-		functype.add("Validate only");
+		functype.add(C_MESG[C_EXECUTE]);
+		functype.add(C_MESG[C_MAP]);
+		functype.add(C_MESG[C_ENUM]);
+		functype.add(C_MESG[C_ONLY]);
 		if(oldtyp == null) {
 			olddef = "";
 		} else if(oldtyp.equals(ParfaitBean.R_ACTION)) {
-			functype.select(0);
+			functype.select(C_EXECUTE);
 		} else if(oldtyp.equals(ParfaitBean.R_MAP)) {
-			functype.select(1);
+			functype.select(C_MAP);
+		} else if(oldtyp.equals(ParfaitBean.R_ENUM)) {
+			functype.select(C_ENUM);
 		} else if(oldtyp.equals(ParfaitBean.R_LOOKUP)) {
-			functype.select(2);
+			functype.select(C_ONLY);
 		}
 		functype.addModifyListener(new ModifyListener() {
 

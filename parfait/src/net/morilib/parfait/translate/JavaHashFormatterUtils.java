@@ -78,6 +78,21 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
+	public static void printEnumDefinition(PrintWriter wr,
+			String className) {
+		wr.printf("public enum %s {\n", className);
+		wr.println();
+	}
+
+	public static void printEnumList(PrintWriter wr, PerfectHash ph,
+			Map<String, String> vs) {
+		for(Map.Entry<String, String> v : vs.entrySet()) {
+			wr.printf("\t%s,\n", v.getValue());
+		}
+		wr.println("\t;");
+		wr.println();
+	}
+
 	public static void printEnum(PrintWriter wr, PerfectHash ph) {
 		wr.printf("\tpublic static final int TOTAL_KEYWORDS = %d;\n",
 				ph.getTotalKeywords());
@@ -148,6 +163,27 @@ public final class JavaHashFormatterUtils {
 		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
 			if(m.containsKey(k)) {
 				wr.printf("\t\t\"%s\",\n", m.get(k));
+			} else {
+				wr.printf("\t\tnull,\n");
+			}
+		}
+		wr.println("\n\t};");
+		wr.println();
+	}
+
+	public static void printEnumMap(PrintWriter wr, PerfectHash ph,
+			String enumName, Map<String, String> vs) {
+		Map<Integer, String> m = new HashMap<Integer, String>();
+
+		for(Map.Entry<String, String> s : vs.entrySet()) {
+			m.put(ph.hashCode(s.getKey()), esc(s.getValue()));
+		}
+
+		wr.printf("\tprivate static %s[] mapped_wordlist = new %s[] {\n",
+				enumName, enumName);
+		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
+			if(m.containsKey(k)) {
+				wr.printf("\t\t%s,\n", m.get(k));
 			} else {
 				wr.printf("\t\tnull,\n");
 			}
@@ -279,11 +315,12 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printMapFunction(PrintWriter wr,
-			PerfectHash ph) {
-		wr.println("\tpublic static String lookup(String key) {");
+	public static void printMapFunction(PrintWriter wr, PerfectHash ph,
+			String type) {
+		wr.printf ("\tpublic static %s lookup(String key) {\n", type);
 		wr.println("\t\tint l = hashCode(key);");
-		wr.println("\t\tString s;");
+		wr.printf ("\t\tString s;\n");
+		wr.printf ("\t\t%s r;\n", type);
 		wr.println();
 		wr.println("\t\tif(l < MIN_HASH_VALUE || l > MAX_HASH_VALUE) {");
 		wr.println("\t\t\treturn null;");
@@ -292,9 +329,9 @@ public final class JavaHashFormatterUtils {
 		wr.println("\t\t\treturn null;");
 		wr.println("\t\t} else if(!s.equals(key)) {");
 		wr.println("\t\t\treturn null;");
-		wr.printf ("\t\t} else if((s = mapped_wordlist[l - %d]) != null) {\n",
+		wr.printf ("\t\t} else if((r = mapped_wordlist[l - %d]) != null) {\n",
 				ph.getMinHashValue());
-		wr.println("\t\t\treturn s;");
+		wr.println("\t\t\treturn r;");
 		wr.println("\t\t} else {");
 		wr.println("\t\t\treturn null;");
 		wr.println("\t\t}");

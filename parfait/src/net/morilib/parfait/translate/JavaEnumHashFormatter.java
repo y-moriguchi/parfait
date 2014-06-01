@@ -20,7 +20,7 @@ import java.util.Map;
 
 import net.morilib.parfait.core.PerfectHash;
 
-public class JavaMapHashFormatter extends JavaHashFormatter {
+public class JavaEnumHashFormatter extends JavaHashFormatter {
 
 	/**
 	 * 
@@ -47,14 +47,15 @@ public class JavaMapHashFormatter extends JavaHashFormatter {
 		JavaHashFormatterUtils.printLicense(wr, license);
 		JavaHashFormatterUtils.printPrologue(wr, prologue);
 		JavaHashFormatterUtils.printDescription(wr, desc);
-		JavaHashFormatterUtils.printClassDefinition(wr, name);
+		JavaHashFormatterUtils.printEnumDefinition(wr, name);
+		JavaHashFormatterUtils.printEnumList(wr, p, map);
 		JavaHashFormatterUtils.printEnum(wr, p);
 		JavaHashFormatterUtils.printAssoValues(wr, p);
 		JavaHashFormatterUtils.printWordlist(wr, p, map.keySet());
-		JavaHashFormatterUtils.printMappedWordlist(wr, p, map);
+		JavaHashFormatterUtils.printEnumMap(wr, p, name, map);
 		JavaHashFormatterUtils.printHashFunction(wr, p);
 		JavaHashFormatterUtils.printLookupFunction(wr, p);
-		JavaHashFormatterUtils.printMapFunction(wr, p, "String");
+		JavaHashFormatterUtils.printMapFunction(wr, p, name);
 		JavaHashFormatterUtils.printAuxiliary(wr, aux);
 		JavaHashFormatterUtils.printClassEpilogue(wr);
 		return true;
