@@ -49,6 +49,7 @@ public class ParfaitBean {
 	String language = "Java";
 	String functionType = R_DEFAULT, defaultAction, columns;
 	boolean automatically = true, plusLength = false;
+	boolean ignoreCase = false;
 
 	/**
 	 * 
@@ -120,6 +121,14 @@ public class ParfaitBean {
 	 */
 	public boolean isPlusLength() {
 		return plusLength;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isIgnoreCase() {
+		return ignoreCase;
 	}
 
 }

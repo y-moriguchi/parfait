@@ -43,7 +43,7 @@ public class PerfectHashFormatDrv2 {
 		l.put("神無月", "return \"OCT\";");
 		l.put("霜月",   "return \"NOV\";");
 		l.put("師走",   "return \"DEC\";");
-		p = PerfectHash.chooseKeys(1, l.keySet());
+		p = PerfectHash.chooseKeys(1, false, l.keySet());
 
 		wr = new PrintWriter(new OutputStreamWriter(System.out), true);
 		JavaHashFormatterUtils.printLicense(wr, "");

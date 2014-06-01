@@ -35,7 +35,7 @@ public final class JavaHashFormatterUtils {
 
 	//
 	static PerfectHash gethash(Collection<String> it,
-			String columns, boolean pluslen) {
+			String columns, boolean pluslen, boolean ic) {
 		PermutationInclementor i;
 		int x = -1;
 
@@ -44,9 +44,9 @@ public final class JavaHashFormatterUtils {
 				x = x < s.length() ? s.length() : x;
 			}
 			i = PermutationInclementor.newInstance(columns, x);
-			return PerfectHash.chooseKeys(1, i, pluslen, it);
+			return PerfectHash.chooseKeys(1, i, pluslen, ic, it);
 		} else {
-			return PerfectHash.chooseKeys(1, it);
+			return PerfectHash.chooseKeys(1, ic, it);
 		}
 	}
 
@@ -203,14 +203,23 @@ public final class JavaHashFormatterUtils {
 		if(ph.isASCII()) {
 			wr.println("\t\tint c = s.charAt(l);");
 			wr.println();
+			if(ph.isIgnoreCase()) {
+				wr.println("\t\tc = Character.toUpperCase((char)c);");
+			}
 			wr.printf("\t\treturn c < 0 || c > 127 ? %d : asso_values[c];\n", out);
 		} else if(ph.isByte()) {
 			wr.println("\t\tint c = s.charAt(l / 2);");
 			wr.println();
+			if(ph.isIgnoreCase()) {
+				wr.println("\t\tc = Character.toUpperCase((char)c);");
+			}
 			wr.println("\t\treturn asso_values[(l % 2 > 0 ? c & 0xff : c >> 8)];");
 		} else {
 			wr.println("\t\tint c = s.charAt(l);");
 			wr.println();
+			if(ph.isIgnoreCase()) {
+				wr.println("\t\tc = Character.toUpperCase((char)c);");
+			}
 			wr.printf("\t\treturn c < %d || c > %d ? %d : asso_values[c - %d];\n",
 					ph.getMinimum(), ph.getMaximum(), out, ph.getMinimum());
 		}
@@ -295,6 +304,19 @@ public final class JavaHashFormatterUtils {
 		wr.println("\t\t\t" + d);
 		wr.println("\t\t} else if(l > MAX_WORD_LENGTH) {");
 		wr.println("\t\t\t" + d);
+		wr.println("\t\t} else if((l = hashCode(v)) < MIN_HASH_VALUE) {");
+		wr.println("\t\t\t" + d);
+		wr.println("\t\t} else if(l > MAX_HASH_VALUE) {");
+		wr.println("\t\t\t" + d);
+		wr.printf ("\t\t} else if((s = wordlist[l - %d]) == null) {\n",
+				ph.getMinHashValue());
+		wr.println("\t\t\t" + d);
+		if(ph.isIgnoreCase()) {
+			wr.println("\t\t} else if(!s.equalsIgnoreCase(v)) {");
+		} else {
+			wr.println("\t\t} else if(!s.equals(v)) {");
+		}
+		wr.println("\t\t\t" + d);
 		wr.println("\t\t} else {");
 		wr.println("\t\t\tswitch(hashCode(v)) {");
 		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
@@ -322,12 +344,28 @@ public final class JavaHashFormatterUtils {
 		wr.printf ("\t\tString s;\n");
 		wr.printf ("\t\t%s r;\n", type);
 		wr.println();
-		wr.println("\t\tif(l < MIN_HASH_VALUE || l > MAX_HASH_VALUE) {");
+		wr.println("\t\tif(key == null) {");
+		wr.println("\t\t\treturn null;");
+		if(ph.isByte()) {
+			wr.println("\t\t} else if((l = key.length() * 2) < MIN_WORD_LENGTH) {");
+		} else {
+			wr.println("\t\t} else if((l = key.length()) < MIN_WORD_LENGTH) {");
+		}
+		wr.println("\t\t\treturn null;");
+		wr.println("\t\t} else if(l > MAX_WORD_LENGTH) {");
+		wr.println("\t\t\treturn null;");
+		wr.println("\t\t} else if((l = hashCode(key)) < MIN_HASH_VALUE) {");
+		wr.println("\t\t\treturn null;");
+		wr.println("\t\t} else if(l > MAX_HASH_VALUE) {");
 		wr.println("\t\t\treturn null;");
 		wr.printf ("\t\t} else if((s = wordlist[l - %d]) == null) {\n",
 				ph.getMinHashValue());
 		wr.println("\t\t\treturn null;");
-		wr.println("\t\t} else if(!s.equals(key)) {");
+		if(ph.isIgnoreCase()) {
+			wr.println("\t\t} else if(!s.equalsIgnoreCase(key)) {");
+		} else {
+			wr.println("\t\t} else if(!s.equals(key)) {");
+		}
 		wr.println("\t\t\treturn null;");
 		wr.printf ("\t\t} else if((r = mapped_wordlist[l - %d]) != null) {\n",
 				ph.getMinHashValue());

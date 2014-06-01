@@ -31,17 +31,19 @@ public class PerfectHash {
 	private int minWordLength;
 	private int maxWordLength;
 	private boolean addLength;
+	private boolean ignoreCase;
 
 	//
 	private PerfectHash(SortedSet<MyChar> c,
 			KeysigStatistics<MyChar> s, PermutationInclementor p,
-			int max, int min, boolean add) {
+			int max, int min, boolean add, boolean icase) {
 		cset = c;
 		stat = s;
 		perm = p;
 		maxWordLength = max;
 		minWordLength = min;
 		addLength = add;
+		ignoreCase = icase;
 	}
 
 	/**
@@ -126,6 +128,14 @@ public class PerfectHash {
 
 	/**
 	 * 
+	 * @return
+	 */
+	public boolean isIgnoreCase() {
+		return ignoreCase;
+	}
+
+	/**
+	 * 
 	 * @param x
 	 * @return
 	 */
@@ -199,7 +209,9 @@ public class PerfectHash {
 	public int hashCode(String s) {
 		Keysig<MyChar> k;
 
-		k = isByte() ? perm.pickByte(s) : perm.pickCharacter(s);
+		k = isByte() ?
+				perm.pickByte(s, ignoreCase) :
+					perm.pickCharacter(s, ignoreCase);
 		return stat.hashCode(k, addLength);
 	}
 
@@ -209,7 +221,7 @@ public class PerfectHash {
 	 * @param keys
 	 * @return
 	 */
-	public static PerfectHash chooseKeys(int add,
+	public static PerfectHash chooseKeys(int add, boolean ignoreCase,
 			Iterable<String> keys) {
 		SortedSet<MyChar> c = new TreeSet<MyChar>();
 		SortedSet<MyChar> b = new TreeSet<MyChar>();
@@ -219,14 +231,17 @@ public class PerfectHash {
 		List<Keysig<MyChar>> l;
 		int m = Integer.MAX_VALUE, x = -1;
 		boolean f;
+		char h;
 
 		for(String s : keys) {
 			m = m > s.length() ? s.length() : m;
 			x = x < s.length() ? s.length() : x;
 			for(int k = 0; k < s.length(); k++) {
-				c.add(MyChar.valueOf(s.charAt(k)));
-				b.add(MyChar.valueOf((char)(s.charAt(k) & 0xff)));
-				b.add(MyChar.valueOf((char)(s.charAt(k) >> 8)));
+				h = s.charAt(k);
+				h = ignoreCase ? Character.toUpperCase(h): h;
+				c.add(MyChar.valueOf(h));
+				b.add(MyChar.valueOf((char)(h & 0xff)));
+				b.add(MyChar.valueOf((char)(h >> 8)));
 			}
 		}
 
@@ -236,20 +251,26 @@ public class PerfectHash {
 		do {
 			l = new ArrayList<Keysig<MyChar>>();
 			if(f) {
-				for(String s : keys)  l.add(p.pickCharacter(s));
+				for(String s : keys) {
+					l.add(p.pickCharacter(s, ignoreCase));
+				}
 			} else {
-				for(String s : keys)  l.add(p.pickByte(s));
+				for(String s : keys) {
+					l.add(p.pickByte(s, ignoreCase));
+				}
 			}
 			t = new MyCharacterSet<MyChar>(l);
 
 			r = KeysigStatistics.compute(t, l, add, false, false);
 			if(r != null) {
-				return new PerfectHash(c, r, p, x, m, false);
+				return new PerfectHash(c, r, p, x, m, false,
+						ignoreCase);
 			}
 
 			r = KeysigStatistics.compute(t, l, add, false, true);
 			if(r != null) {
-				return new PerfectHash(c, r, p, x, m, true);
+				return new PerfectHash(c, r, p, x, m, true,
+						ignoreCase);
 			}
 		} while((p = p.nextAll()) != null);
 		return null;
@@ -265,7 +286,7 @@ public class PerfectHash {
 	 */
 	public static PerfectHash chooseKeys(int add,
 			PermutationInclementor p, boolean pluslen,
-			Iterable<String> keys) {
+			boolean ignoreCase, Iterable<String> keys) {
 		SortedSet<MyChar> c = new TreeSet<MyChar>();
 		SortedSet<MyChar> b = new TreeSet<MyChar>();
 		KeysigStatistics<MyChar> r;
@@ -273,14 +294,17 @@ public class PerfectHash {
 		List<Keysig<MyChar>> l;
 		int m = Integer.MAX_VALUE, x = -1;
 		boolean f;
+		char h;
 
 		for(String s : keys) {
 			m = m > s.length() ? s.length() : m;
 			x = x < s.length() ? s.length() : x;
 			for(int k = 0; k < s.length(); k++) {
-				c.add(MyChar.valueOf(s.charAt(k)));
-				b.add(MyChar.valueOf((char)(s.charAt(k) & 0xff)));
-				b.add(MyChar.valueOf((char)(s.charAt(k) >> 8)));
+				h = s.charAt(k);
+				h = ignoreCase ? Character.toUpperCase(h): h;
+				c.add(MyChar.valueOf(h));
+				b.add(MyChar.valueOf((char)(h & 0xff)));
+				b.add(MyChar.valueOf((char)(h >> 8)));
 			}
 		}
 
@@ -288,15 +312,19 @@ public class PerfectHash {
 		c = f ? c : b;
 		l = new ArrayList<Keysig<MyChar>>();
 		if(f) {
-			for(String s : keys)  l.add(p.pickCharacter(s));
+			for(String s : keys) {
+				l.add(p.pickCharacter(s, ignoreCase));
+			}
 		} else {
-			for(String s : keys)  l.add(p.pickByte(s));
+			for(String s : keys) {
+				l.add(p.pickByte(s, ignoreCase));
+			}
 		}
 
 		t = new MyCharacterSet<MyChar>(l);
 		r = KeysigStatistics.compute(t, l, add, false, pluslen);
 		if(r != null) {
-			return new PerfectHash(c, r, p, x, m, pluslen);
+			return new PerfectHash(c, r, p, x, m, pluslen, ignoreCase);
 		} else {
 			return null;
 		}

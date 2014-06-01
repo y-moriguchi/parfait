@@ -192,6 +192,8 @@ public final class DeserializeParfaitXML {
 				mb.functionType = readTextNode(nd).trim();
 			} else if(nd.getNodeName().equals("default-action")) {
 				mb.defaultAction = readTextNode(nd).trim();
+			} else if(nd.getNodeName().equals("ignore-case")) {
+				mb.ignoreCase = "true".equals(readTextNode(nd).trim());
 			} else if(nd.getNodeName().equals("compute-hash")) {
 				readHashComp(mb, nd);
 			} else if(nd.getNodeName().equals("keywords")) {

@@ -26,6 +26,7 @@ public interface HashFormatter {
 	 * @param hf
 	 * @param columns
 	 * @param pluslen
+	 * @param ignoreCase
 	 * @param name
 	 * @param map
 	 * @param defaultAction
@@ -37,7 +38,7 @@ public interface HashFormatter {
 	 */
 	public boolean print(PrintWriter wr,
 			HashFormatter hf, String columns, boolean pluslen,
-			String name, Map<String, String> map,
+			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux);
 

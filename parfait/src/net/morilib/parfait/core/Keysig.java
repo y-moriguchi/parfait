@@ -46,12 +46,15 @@ public class Keysig<T> implements Iterable<T> {
 	 * @param s
 	 * @return
 	 */
-	public static Keysig<Character> newInstance(String s, int len) {
+	public static Keysig<Character> newInstance(String s, int len,
+			boolean ignoreCase) {
 		TinySortedBag<Character> r;
+		char c;
 
 		r = new TinySortedBag<Character>();
 		for(int k = 0; k < s.length(); k++) {
-			r.add(s.charAt(k));
+			c = s.charAt(k);
+			r.add(ignoreCase ? Character.toUpperCase(c) : c);
 		}
 		return new Keysig<Character>(r, len, false);
 	}

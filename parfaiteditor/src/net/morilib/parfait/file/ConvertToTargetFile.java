@@ -24,7 +24,7 @@ public final class ConvertToTargetFile {
 			String name, ParfaitPageEditor ed) {
 		String license, defAction, prologue, desc, aux, col;
 		Map<String, String> map;
-		boolean plen;
+		boolean plen, icase;
 
 		map = new LinkedHashMap<String, String>();
 		for(KeywordBean k : ed.getKeywords().getKeywordList()) {
@@ -35,6 +35,7 @@ public final class ConvertToTargetFile {
 		prologue  = ed.getAuxiliary().getDefinition();
 		desc      = ed.getDescription().getDescription();
 		aux       = ed.getAuxiliary().getAuxiliary();
+		icase     = ed.getOptions().isIgnoreCase();
 		if(ed.getOptions().isAutomatically()) {
 			col  = null;
 			plen = false;
@@ -42,9 +43,8 @@ public final class ConvertToTargetFile {
 			col  = ed.getOptions().getColumns();
 			plen = ed.getOptions().isPlusLength();
 		}
-		return hf.print(wr, hf, col, plen,
-				name, map, defAction, license, prologue, desc,
-				aux);
+		return hf.print(wr, hf, col, plen, icase, name, map, defAction,
+				license, prologue, desc, aux);
 	}
 
 }

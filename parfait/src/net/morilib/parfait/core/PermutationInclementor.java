@@ -203,14 +203,19 @@ implements Iterable<Integer>, Cloneable {
 	}
 
 	//
-	private void _pick(TinySortedBag<MyChar> b, String s) {
+	private void _pick(TinySortedBag<MyChar> b, String s, boolean ic) {
+		char c;
+
 		if(basis != null) {
 			if(value < 0) {
-				b.add(MyChar.valueOf(s.charAt(s.length() + value)));
+				c = s.charAt(s.length() + value);
+				c = ic ? Character.toUpperCase(c) : c;
 			} else {
-				b.add(MyChar.valueOf(s.charAt(value)));
+				c = s.charAt(value);
+				c = ic ? Character.toUpperCase(c) : c;
 			}
-			basis._pick(b, s);
+			b.add(MyChar.valueOf(c));
+			basis._pick(b, s, ic);
 		}
 	}
 
@@ -219,31 +224,34 @@ implements Iterable<Integer>, Cloneable {
 	 * @param s
 	 * @return
 	 */
-	public Keysig<MyChar> pickCharacter(String s) {
+	public Keysig<MyChar> pickCharacter(String s, boolean ignoreCase) {
 		TinySortedBag<MyChar> b = new TinySortedBag<MyChar>();
 
-		_pick(b, s);
+		_pick(b, s, ignoreCase);
 		return new Keysig<MyChar>(b, s.length());
 	}
 
 	//
-	private MyChar _getb(String s, int l) {
+	private MyChar _getb(String s, int l, boolean ic) {
+		char c;
 		int x;
 
-		x = s.charAt(l >> 1);
-		x = l % 2 == 0 ? x >> 8 : x & 0xff; 
+		c = s.charAt(l >> 1);
+		c = ic ? Character.toUpperCase(c) : c;
+		x = l % 2 == 0 ? c >> 8 : c & 0xff; 
 		return MyChar.valueOf((char)x);
 	}
 
 	//
-	private void _pickbyte(TinySortedBag<MyChar> b, String s) {
+	private void _pickbyte(TinySortedBag<MyChar> b, String s,
+			boolean ic) {
 		if(basis != null) {
 			if(value < 0) {
-				b.add(_getb(s, s.length() * 2 + value));
+				b.add(_getb(s, s.length() * 2 + value, ic));
 			} else {
-				b.add(_getb(s, value));
+				b.add(_getb(s, value, ic));
 			}
-			basis._pickbyte(b, s);
+			basis._pickbyte(b, s, ic);
 		}
 	}
 
@@ -252,10 +260,10 @@ implements Iterable<Integer>, Cloneable {
 	 * @param s
 	 * @return
 	 */
-	public Keysig<MyChar> pickByte(String s) {
+	public Keysig<MyChar> pickByte(String s, boolean ignoreCase) {
 		TinySortedBag<MyChar> b = new TinySortedBag<MyChar>();
 
-		_pickbyte(b, s);
+		_pickbyte(b, s, ignoreCase);
 		return new Keysig<MyChar>(b, s.length() * 2);
 	}
 

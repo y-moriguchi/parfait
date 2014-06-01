@@ -22,26 +22,18 @@ import net.morilib.parfait.core.PerfectHash;
 
 public class JavaEnumHashFormatter extends JavaHashFormatter {
 
-	/**
-	 * 
-	 * @param wr
-	 * @param hf
-	 * @param name
-	 * @param map
-	 * @param defaultAction
-	 * @param license
-	 * @param prologue
-	 * @return
+	/* (non-Javadoc)
+	 * @see net.morilib.parfait.translate.HashFormatter#print(java.io.PrintWriter, net.morilib.parfait.translate.HashFormatter, java.lang.String, boolean, boolean, java.lang.String, java.util.Map, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public boolean print(PrintWriter wr,
 			HashFormatter hf, String columns, boolean pluslen,
-			String name, Map<String, String> map,
+			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux) {
 		PerfectHash p;
 
 		if((p = JavaHashFormatterUtils.gethash(
-				map.keySet(), columns, pluslen)) == null) {
+				map.keySet(), columns, pluslen, ignoreCase)) == null) {
 			return false;
 		}
 		JavaHashFormatterUtils.printLicense(wr, license);

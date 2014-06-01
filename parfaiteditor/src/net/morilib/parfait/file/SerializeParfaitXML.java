@@ -80,6 +80,9 @@ public final class SerializeParfaitXML {
 				esc(oe.getType()));
 		pw.printf("<default-action>%s</default-action>\n",
 				esc(oe.getDefaultAction()));
+		pw.printf("<ignore-case>%s</ignore-case>\n",
+				oe.isIgnoreCase() ? "true" : "false");
+
 		pw.println("<compute-hash>");
 		pw.printf("<auto>%s</auto>\n",
 				oe.isAutomatically() ? "true" : "false");

@@ -62,12 +62,13 @@ public class OptionsEditor extends FormPage {
 	Button cAuto;
 	Text columns;
 	Combo pluslen;
+	Button ignoreCase;
 
 	//
 	private ParfaitPageEditor editor;
 	private boolean dirty = false;
 	private String oldlan, olddef, oldtyp, oldcol;
-	private boolean oldaut, oldlen;
+	private boolean oldaut, oldlen, oldcas;
 
 	/**
 	 * 
@@ -179,6 +180,14 @@ public class OptionsEditor extends FormPage {
 				pluslen.getSelectionIndex() == 1 : oldlen;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isIgnoreCase() {
+		return ignoreCase != null ? ignoreCase.getSelection() : oldcas;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormPage#isDirty()
 	 */
@@ -274,6 +283,23 @@ public class OptionsEditor extends FormPage {
 
 		});
 
+		tk.createLabel(cm, "");
+		ignoreCase = tk.createButton(cm, "Ignore Case", SWT.CHECK);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		ignoreCase.setLayoutData(gd);
+		ignoreCase.setSelection(oldcas);
+		ignoreCase.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(!dirty && oldcas != cAuto.getSelection()) {
+					dirty = true;
+					editor.editorDirtyStateChanged();
+				}
+			}
+
+		});
+
 		tk.createLabel(cm, "Columns");
 		cAuto = tk.createButton(cm, "Decide Automatically", SWT.CHECK);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -349,6 +375,7 @@ public class OptionsEditor extends FormPage {
 		oldaut = act.isAutomatically();
 		oldcol = act.getColumns();
 		oldlen = act.isPlusLength();
+		oldcas = act.isIgnoreCase();
 	}
 
 	/* (non-Javadoc)

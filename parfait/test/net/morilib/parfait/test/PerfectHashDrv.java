@@ -39,7 +39,7 @@ public class PerfectHashDrv {
 		l.add("october");
 		l.add("november");
 		l.add("december");
-		p = PerfectHash.chooseKeys(1, l);
+		p = PerfectHash.chooseKeys(1, false, l);
 		System.out.println(p.getPermutation());
 		for(String s : l)  System.out.println(p.hashCode(s));
 	}
