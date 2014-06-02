@@ -29,7 +29,7 @@ public class JavaMapHashFormatter extends JavaHashFormatter {
 			HashFormatter hf, String columns, boolean pluslen,
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
-			String desc, String aux) {
+			String desc, String aux, String type) {
 		PerfectHash p;
 
 		if((p = JavaHashFormatterUtils.gethash(
@@ -48,6 +48,7 @@ public class JavaMapHashFormatter extends JavaHashFormatter {
 		JavaHashFormatterUtils.printLookupFunction(wr, p);
 		JavaHashFormatterUtils.printMapFunction(wr, p, "String");
 		JavaHashFormatterUtils.printAuxiliary(wr, aux);
+		JavaHashFormatterUtils.printValidateFunction(wr, p);
 		JavaHashFormatterUtils.printClassEpilogue(wr);
 		return true;
 	}

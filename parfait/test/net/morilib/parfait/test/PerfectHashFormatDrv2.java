@@ -54,7 +54,7 @@ public class PerfectHashFormatDrv2 {
 		JavaHashFormatterUtils.printWordlist(wr, p, l.keySet());
 		JavaHashFormatterUtils.printHashFunction(wr, p);
 		JavaHashFormatterUtils.printLookupFunction(wr, p);
-		JavaHashFormatterUtils.printExecuteFunction(wr, p, l, null);
+		JavaHashFormatterUtils.printExecuteFunction(wr, p, "void", l, null);
 		JavaHashFormatterUtils.printClassEpilogue(wr);
 	}
 

@@ -34,13 +34,14 @@ public interface HashFormatter {
 	 * @param prologue
 	 * @param desc
 	 * @param aux
+	 * @param type
 	 * @return
 	 */
 	public boolean print(PrintWriter wr,
 			HashFormatter hf, String columns, boolean pluslen,
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
-			String desc, String aux);
+			String desc, String aux, String type);
 
 	/**
 	 * 

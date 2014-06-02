@@ -18,9 +18,7 @@ package net.morilib.parfait.translate;
 import java.io.PrintWriter;
 import java.util.Map;
 
-import net.morilib.parfait.core.PerfectHash;
-
-public class JavaExecuteHashFormatter extends JavaHashFormatter {
+public class JavaMapTestFormatter extends JavaTestFormatter {
 
 	/* (non-Javadoc)
 	 * @see net.morilib.parfait.translate.HashFormatter#print(java.io.PrintWriter, net.morilib.parfait.translate.HashFormatter, java.lang.String, boolean, boolean, java.lang.String, java.util.Map, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
@@ -30,26 +28,12 @@ public class JavaExecuteHashFormatter extends JavaHashFormatter {
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type) {
-		PerfectHash p;
-
-		if((p = JavaHashFormatterUtils.gethash(
-				map.keySet(), columns, pluslen, ignoreCase)) == null) {
-			return false;
-		}
 		JavaHashFormatterUtils.printLicense(wr, license);
 		JavaHashFormatterUtils.printPrologue(wr, prologue);
-		JavaHashFormatterUtils.printDescription(wr, desc);
-		JavaHashFormatterUtils.printClassDefinition(wr, name);
-		JavaHashFormatterUtils.printEnum(wr, p);
-		JavaHashFormatterUtils.printAssoValues(wr, p);
-		JavaHashFormatterUtils.printWordlist(wr, p, map.keySet());
-		JavaHashFormatterUtils.printHashFunction(wr, p);
-		JavaHashFormatterUtils.printLookupFunction(wr, p);
-		JavaHashFormatterUtils.printExecuteFunction(wr, p, type, map,
-				defaultAction);
-		JavaHashFormatterUtils.printAuxiliary(wr, aux);
-		JavaHashFormatterUtils.printValidateFunction(wr, p);
-		JavaHashFormatterUtils.printClassEpilogue(wr);
+		JavaHashFormatterUtils.printTestCaseDefinition(wr, name);
+		JavaHashFormatterUtils.printMapTestCase(wr, name, map);
+		JavaHashFormatterUtils.printValidateTestCase(wr, name, map);
+		JavaHashFormatterUtils.printTestCaseEpilogue(wr);
 		return true;
 	}
 

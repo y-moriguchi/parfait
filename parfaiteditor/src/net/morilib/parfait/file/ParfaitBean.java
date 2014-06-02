@@ -47,9 +47,10 @@ public class ParfaitBean {
 	DescriptionBean description = new DescriptionBean();
 	AuxiliaryCodeBean auxiliary = new AuxiliaryCodeBean();
 	String language = "Java";
-	String functionType = R_DEFAULT, defaultAction, columns;
+	String functionType = R_DEFAULT, returnType = "";
+	String defaultAction = "", columns = "";
 	boolean automatically = true, plusLength = false;
-	boolean ignoreCase = false;
+	boolean ignoreCase = false, testCase = false;
 
 	/**
 	 * 
@@ -95,6 +96,14 @@ public class ParfaitBean {
 	 * 
 	 * @return
 	 */
+	public String getReturnType() {
+		return returnType;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public String getDefaultAction() {
 		return defaultAction;
 	}
@@ -129,6 +138,14 @@ public class ParfaitBean {
 	 */
 	public boolean isIgnoreCase() {
 		return ignoreCase;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isTestCase() {
+		return testCase;
 	}
 
 }

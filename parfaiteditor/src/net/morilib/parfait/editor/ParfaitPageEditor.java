@@ -26,6 +26,8 @@ import net.morilib.parfait.translate.HashFormatter;
 import net.morilib.parfait.translate.JavaEnumHashFormatter;
 import net.morilib.parfait.translate.JavaExecuteHashFormatter;
 import net.morilib.parfait.translate.JavaMapHashFormatter;
+import net.morilib.parfait.translate.JavaMapTestFormatter;
+import net.morilib.parfait.translate.JavaVaildateTestFormatter;
 import net.morilib.parfait.translate.JavaValidateHashFormatter;
 
 import org.eclipse.core.resources.IFile;
@@ -169,8 +171,7 @@ public class ParfaitPageEditor extends FormEditor {
 		}
 	}
 
-	
-	public HashFormatter getHashFormatter() {
+	HashFormatter getHashFormatter() {
 		if(options.isAction()) {
 			return new JavaExecuteHashFormatter();
 		} else if(options.isLookup()) {
@@ -184,13 +185,27 @@ public class ParfaitPageEditor extends FormEditor {
 		}
 	}
 
+	HashFormatter getTestFormatter() {
+		if(options.isAction()) {
+			return new JavaVaildateTestFormatter();
+		} else if(options.isLookup()) {
+			return new JavaVaildateTestFormatter();
+		} else if(options.isEnum()) {
+			return new JavaVaildateTestFormatter();
+		} else if(options.isMap()) {
+			return new JavaMapTestFormatter();
+		} else {
+			throw new RuntimeException();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void doSave(IProgressMonitor mon) {
 		ByteArrayOutputStream bot = new ByteArrayOutputStream();
-		HashFormatter hf = getHashFormatter();
+		HashFormatter hf;
 		IFile f = null;
 
 		try {
@@ -200,7 +215,12 @@ public class ParfaitPageEditor extends FormEditor {
 					true, false, mon);
 			f.deleteMarkers(IMarker.PROBLEM, true,
 					IResource.DEPTH_INFINITE);
+			hf = getHashFormatter();
 			convert(f, getFile(hf), hf, mon);
+			if(options.isTestCase()) {
+				hf = getTestFormatter();
+				convert(f, getFile(hf), hf, mon);
+			}
 
 			keywords.setDirty(false);
 			description.setDirty(false);
@@ -235,8 +255,8 @@ public class ParfaitPageEditor extends FormEditor {
 
 			public void execute(
 					final IProgressMonitor mon) throws CoreException {
-				HashFormatter hf = getHashFormatter();
 				ByteArrayOutputStream b;
+				HashFormatter hf;
 
 				try {
 					b = new ByteArrayOutputStream();
@@ -244,7 +264,12 @@ public class ParfaitPageEditor extends FormEditor {
 							ParfaitPageEditor.this);
 					f.create(new ByteArrayInputStream(b.toByteArray()),
 							true, mon);
+					hf = getHashFormatter();
 					convert(f, getFile(f, hf), hf, mon);
+					if(options.isTestCase()) {
+						hf = getTestFormatter();
+						convert(f, getFile(hf), hf, mon);
+					}
 				} catch(Exception e) {
 					e.printStackTrace();
 				}

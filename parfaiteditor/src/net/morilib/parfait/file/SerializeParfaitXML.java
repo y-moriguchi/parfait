@@ -78,10 +78,14 @@ public final class SerializeParfaitXML {
 				esc(oe.getLanguage()));
 		pw.printf("<function-type>%s</function-type>\n",
 				esc(oe.getType()));
+		pw.printf("<return-type>%s</return-type>\n",
+				esc(oe.getReturnType()));
 		pw.printf("<default-action>%s</default-action>\n",
 				esc(oe.getDefaultAction()));
 		pw.printf("<ignore-case>%s</ignore-case>\n",
 				oe.isIgnoreCase() ? "true" : "false");
+		pw.printf("<test-case>%s</test-case>\n",
+				oe.isTestCase() ? "true" : "false");
 
 		pw.println("<compute-hash>");
 		pw.printf("<auto>%s</auto>\n",

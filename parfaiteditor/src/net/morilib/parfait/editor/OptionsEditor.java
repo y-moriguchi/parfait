@@ -57,18 +57,18 @@ public class OptionsEditor extends FormPage {
 	};
 
 	//
-	Text defaultAction;
+	Text returnType, defaultAction;
 	Combo language, functype;
-	Button cAuto;
+	Button ignoreCase, cAuto;
 	Text columns;
 	Combo pluslen;
-	Button ignoreCase;
+	Button testCase;
 
 	//
 	private ParfaitPageEditor editor;
 	private boolean dirty = false;
-	private String oldlan, olddef, oldtyp, oldcol;
-	private boolean oldaut, oldlen, oldcas;
+	private String oldlan, oldret, olddef, oldtyp, oldcol;
+	private boolean oldaut, oldlen, oldcas, oldtes;
 
 	/**
 	 * 
@@ -77,6 +77,14 @@ public class OptionsEditor extends FormPage {
 	public OptionsEditor(ParfaitPageEditor page) {
 		super(page, "options", "Options");
 		this.editor = page;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getReturnType() {
+		return returnType != null ? returnType.getText() : oldret;
 	}
 
 	/**
@@ -188,6 +196,14 @@ public class OptionsEditor extends FormPage {
 		return ignoreCase != null ? ignoreCase.getSelection() : oldcas;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isTestCase() {
+		return testCase != null ? testCase.getSelection() : oldtes;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.forms.editor.FormPage#isDirty()
 	 */
@@ -261,6 +277,28 @@ public class OptionsEditor extends FormPage {
 
 		});
 
+		tk.createLabel(cm, "Return type of Action");
+		returnType = tk.createText(cm, "");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		returnType.setLayoutData(gd);
+		if(oldret != null) {
+			returnType.setText(oldret);
+		} else {
+			oldret = "";
+		}
+		returnType.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if(dirty) {
+					// do nothing
+				} else if(dirty = !oldret.equals(e.data)) {
+					editor.editorDirtyStateChanged();
+				}
+			}
+
+		});
+
 		tk.createLabel(cm, "Default Action");
 		defaultAction = tk.createText(cm, "");
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -292,7 +330,7 @@ public class OptionsEditor extends FormPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if(!dirty && oldcas != cAuto.getSelection()) {
+				if(!dirty && oldcas != ignoreCase.getSelection()) {
 					dirty = true;
 					editor.editorDirtyStateChanged();
 				}
@@ -364,18 +402,37 @@ public class OptionsEditor extends FormPage {
 		});
 		columns.setEnabled(!oldaut);
 		pluslen.setEnabled(!oldaut);
+
+		tk.createLabel(cm, "");
+		testCase = tk.createButton(cm, "Create a test case", SWT.CHECK);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		testCase.setLayoutData(gd);
+		testCase.setSelection(oldtes);
+		testCase.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(!dirty && oldtes != testCase.getSelection()) {
+					dirty = true;
+					editor.editorDirtyStateChanged();
+				}
+			}
+
+		});
 		sc.setClient(cm);
 	}
 
 	//
 	private void loadFragment(ParfaitBean act) {
 		oldlan = act.getLanguage();
+		oldret = act.getReturnType();
 		olddef = act.getDefaultAction();
 		oldtyp = act.getFunctionType();
 		oldaut = act.isAutomatically();
 		oldcol = act.getColumns();
 		oldlen = act.isPlusLength();
 		oldcas = act.isIgnoreCase();
+		oldtes = act.isTestCase();
 	}
 
 	/* (non-Javadoc)

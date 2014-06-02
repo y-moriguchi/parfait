@@ -22,7 +22,7 @@ public final class ConvertToTargetFile {
 	 */
 	public static boolean output(HashFormatter hf, PrintWriter wr,
 			String name, ParfaitPageEditor ed) {
-		String license, defAction, prologue, desc, aux, col;
+		String license, rettype, defAction, prologue, desc, aux, col;
 		Map<String, String> map;
 		boolean plen, icase;
 
@@ -30,6 +30,7 @@ public final class ConvertToTargetFile {
 		for(KeywordBean k : ed.getKeywords().getKeywordList()) {
 			map.put(k.getKeyword(), k.getAction());
 		}
+		rettype   = ed.getOptions().getReturnType();
 		defAction = ed.getOptions().getDefaultAction();
 		license   = ed.getDescription().getLicense();
 		prologue  = ed.getAuxiliary().getDefinition();
@@ -44,7 +45,7 @@ public final class ConvertToTargetFile {
 			plen = ed.getOptions().isPlusLength();
 		}
 		return hf.print(wr, hf, col, plen, icase, name, map, defAction,
-				license, prologue, desc, aux);
+				license, prologue, desc, aux, rettype);
 	}
 
 }

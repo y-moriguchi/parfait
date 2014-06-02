@@ -283,7 +283,8 @@ public final class JavaHashFormatterUtils {
 	}
 
 	public static void printExecuteFunction(PrintWriter wr,
-			PerfectHash ph, Map<String, String> vs, String def) {
+			PerfectHash ph, String type, Map<String, String> vs,
+			String def) {
 		Map<Integer, String> m = new HashMap<Integer, String>();
 		String d = def != null ? def : "// do nothing";
 
@@ -291,16 +292,13 @@ public final class JavaHashFormatterUtils {
 			m.put(ph.hashCode(s.getKey()), s.getValue());
 		}
 
-		wr.println("\tpublic static void execute(String v) {");
+		wr.printf ("\tpublic static %s execute(String v) {\n", type);
+		wr.println("\t\tString s;");
 		wr.println("\t\tint l;");
 		wr.println();
 		wr.println("\t\tif(v == null) {");
 		wr.println("\t\t\t" + d);
-		if(ph.isByte()) {
-			wr.println("\t\t} else if((l = v.length() * 2) < MIN_WORD_LENGTH) {");
-		} else {
-			wr.println("\t\t} else if((l = v.length()) < MIN_WORD_LENGTH) {");
-		}
+		wr.println("\t\t} else if((l = v.length()) < MIN_WORD_LENGTH) {");
 		wr.println("\t\t\t" + d);
 		wr.println("\t\t} else if(l > MAX_WORD_LENGTH) {");
 		wr.println("\t\t\t" + d);
@@ -339,18 +337,14 @@ public final class JavaHashFormatterUtils {
 
 	public static void printMapFunction(PrintWriter wr, PerfectHash ph,
 			String type) {
-		wr.printf ("\tpublic static %s lookup(String key) {\n", type);
+		wr.printf ("\tpublic static %s map(String key) {\n", type);
 		wr.println("\t\tint l = hashCode(key);");
 		wr.printf ("\t\tString s;\n");
 		wr.printf ("\t\t%s r;\n", type);
 		wr.println();
 		wr.println("\t\tif(key == null) {");
 		wr.println("\t\t\treturn null;");
-		if(ph.isByte()) {
-			wr.println("\t\t} else if((l = key.length() * 2) < MIN_WORD_LENGTH) {");
-		} else {
-			wr.println("\t\t} else if((l = key.length()) < MIN_WORD_LENGTH) {");
-		}
+		wr.println("\t\t} else if((l = key.length()) < MIN_WORD_LENGTH) {");
 		wr.println("\t\t\treturn null;");
 		wr.println("\t\t} else if(l > MAX_WORD_LENGTH) {");
 		wr.println("\t\t\treturn null;");
@@ -383,17 +377,109 @@ public final class JavaHashFormatterUtils {
 		}
 	}
 
-	public static void printClassEpilogue(PrintWriter wr) {
-		wr.println("\tpublic static boolean isVaild(String l) {");
+	public static void printValidateFunction(PrintWriter wr,
+			PerfectHash ph) {
+		wr.println("\tpublic static boolean isValid(String l) {");
 		wr.println("\t\tString s;");
 		wr.println("\t\tint x;");
 		wr.println();
 		wr.println("\t\treturn (l != null &&");
+		wr.println("\t\t\t\t(x = l.length()) <= MAX_WORD_LENGTH &&");
+		wr.println("\t\t\t\tx >= MIN_WORD_LENGTH &&");
 		wr.println("\t\t\t\t(x = hashCode(l)) <= MAX_HASH_VALUE &&");
-		wr.println("\t\t\t\t(s = wordlist[x]) != null &&");
-		wr.println("\t\t\t\ts.equals(l));");
+		wr.println("\t\t\t\tx >= MIN_HASH_VALUE &&");
+		wr.println("\t\t\t\t(s = wordlist[x - MIN_HASH_VALUE]) != null &&");
+		if(ph.isIgnoreCase()) {
+			wr.println("\t\t\t\ts.equalsIgnoreCase(l));");
+		} else {
+			wr.println("\t\t\t\ts.equals(l));");
+		}
 		wr.println("\t}");
 		wr.println();
+	}
+
+	public static void printClassEpilogue(PrintWriter wr) {
+		wr.println("}");
+	}
+
+	public static void printTestCaseDefinition(PrintWriter wr,
+			String className) {
+		wr.printf("public class %s extends junit.framework.TestCase {\n",
+				className);
+		wr.println();
+	}
+
+	public static void printMapTestCase(PrintWriter wr,
+			String className, Map<String, String> vs) {
+		String s, v;
+
+		v = className.replaceFirst("Test$", "");
+		wr.printf("\tpublic void test0001() {\n");
+		for(Map.Entry<String, String> t : vs.entrySet()) {
+			s = t.getKey();
+			wr.printf("\t\tassertEquals(\"%s\", %s.map(\"%s\"));\n",
+					t.getValue(), v, s);
+			if(s.length() > 0 && !vs.containsKey(s + s.charAt(0))) {
+				wr.printf("\t\tassertNull(%s.map(\"%s%c\"));\n",
+						v, s, s.charAt(0));
+			}
+
+			if(s.length() > 0 && !vs.containsKey(s.charAt(0) + s)) {
+				wr.printf("\t\tassertNull(%s.map(\"%c%s\"));\n",
+						v, s.charAt(0), s);
+			}
+
+			if(s.length() > 0 && !vs.containsKey(
+					s.charAt(0) + s + s.charAt(0))) {
+				wr.printf("\t\tassertNull(%s.map(\"%c%s%c\"));\n",
+						v, s.charAt(0), s, s.charAt(0));
+			}
+
+			if(s.length() > 0 && !vs.containsKey(s.substring(1))) {
+				wr.printf("\t\tassertNull(%s.map(\"%s\"));\n",
+						v, s.substring(1));
+			}
+		}
+		wr.printf("\t}\n");
+		wr.println();
+	}
+
+	public static void printValidateTestCase(PrintWriter wr,
+			String className, Map<String, String> vs) {
+		String s, v;
+
+		v = className.replaceFirst("Test$", "");
+		wr.printf("\tpublic void test0002() {\n");
+		for(Map.Entry<String, String> t : vs.entrySet()) {
+			s = t.getKey();
+			wr.printf("\t\tassertTrue(%s.isValid(\"%s\"));\n",
+					v, t.getKey());
+			if(s.length() > 0 && !vs.containsKey(s + s.charAt(0))) {
+				wr.printf("\t\tassertFalse(%s.isValid(\"%s%c\"));\n",
+						v, s, s.charAt(0));
+			}
+
+			if(s.length() > 0 && !vs.containsKey(s.charAt(0) + s)) {
+				wr.printf("\t\tassertFalse(%s.isValid(\"%c%s\"));\n",
+						v, s.charAt(0), s);
+			}
+
+			if(s.length() > 0 && !vs.containsKey(
+					s.charAt(0) + s + s.charAt(0))) {
+				wr.printf("\t\tassertFalse(%s.isValid(\"%c%s%c\"));\n",
+						v, s.charAt(0), s, s.charAt(0));
+			}
+
+			if(s.length() > 0 && !vs.containsKey(s.substring(1))) {
+				wr.printf("\t\tassertFalse(%s.isValid(\"%s\"));\n",
+						v, s.substring(1));
+			}
+		}
+		wr.printf("\t}\n");
+		wr.println();
+	}
+
+	public static void printTestCaseEpilogue(PrintWriter wr) {
 		wr.println("}");
 	}
 
