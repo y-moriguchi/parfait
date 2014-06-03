@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Parfait: Perfect Hash Function Generator
-Bundle-SymbolicName: parfaiteditor;singleton:=true
+Bundle-SymbolicName: net.morilib.parfait.editor;singleton:=true
 Bundle-Version: 0.0.0
 Bundle-Vendor: morilib.net
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
