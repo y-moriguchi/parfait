@@ -338,9 +338,9 @@ public final class JavaHashFormatterUtils {
 	public static void printMapFunction(PrintWriter wr, PerfectHash ph,
 			String type) {
 		wr.printf ("\tpublic static %s map(String key) {\n", type);
-		wr.println("\t\tint l = hashCode(key);");
 		wr.printf ("\t\tString s;\n");
 		wr.printf ("\t\t%s r;\n", type);
+		wr.println("\t\tint l;");
 		wr.println();
 		wr.println("\t\tif(key == null) {");
 		wr.println("\t\t\treturn null;");
