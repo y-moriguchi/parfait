@@ -118,7 +118,7 @@ public class ParfaitKeywordsEditor extends FormPage {
 		cm = tk.createComposite(sc);
 		cm.setLayout(new MyGridLayout(2, false));
 
-		b1 = tk.createButton(cm, "Import from a file", SWT.BORDER);
+		b1 = tk.createButton(cm, "Import from a file", SWT.NONE);
 		gd = new GridData();
 		gd.horizontalSpan = 2;
 		b1.setLayoutData(gd);

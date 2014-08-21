@@ -20,8 +20,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import net.morilib.parfait.editor.AuxiliaryCodeEditor;
-import net.morilib.parfait.editor.DescriptionEditor;
 import net.morilib.parfait.editor.OptionsEditor;
 import net.morilib.parfait.editor.ParfaitPageEditor;
 
@@ -67,13 +65,14 @@ public final class SerializeParfaitXML {
 	 * @param model
 	 */
 	public void write() {
-		DescriptionEditor de = editor.getDescription();
-		AuxiliaryCodeEditor ae = editor.getAuxiliary();
+//		DescriptionEditor de = editor.getDescription();
+//		AuxiliaryCodeEditor ae = editor.getAuxiliary();
 		OptionsEditor oe = editor.getOptions();
 
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		pw.println("<parfait>");
 
+		pw.printf("<package>%s</package>\n", esc(oe.getPackage()));
 		pw.printf("<target-language>%s</target-language>\n",
 				esc(oe.getLanguage()));
 		pw.printf("<function-type>%s</function-type>\n",
@@ -82,6 +81,10 @@ public final class SerializeParfaitXML {
 				esc(oe.getReturnType()));
 		pw.printf("<default-action>%s</default-action>\n",
 				esc(oe.getDefaultAction()));
+		pw.printf("<inject>%s</inject>\n",
+				oe.isInject() ? "true" : "false");
+		pw.printf("<create>%s</create>\n",
+				oe.isCreate() ? "true" : "false");
 		pw.printf("<ignore-case>%s</ignore-case>\n",
 				oe.isIgnoreCase() ? "true" : "false");
 		pw.printf("<test-case>%s</test-case>\n",
@@ -104,19 +107,19 @@ public final class SerializeParfaitXML {
 		}
 		pw.println("</keywords>");
 
-		pw.println("<description>");
-		pw.printf("<license>%s</license>\n",
-				esc(de.getLicense()));
-		pw.printf("<description>%s</description>\n",
-				esc(de.getDescription()));
-		pw.println("</description>");
+//		pw.println("<description>");
+//		pw.printf("<license>%s</license>\n",
+//				esc(de.getLicense()));
+//		pw.printf("<description>%s</description>\n",
+//				esc(de.getDescription()));
+//		pw.println("</description>");
 
-		pw.println("<auxiliary>");
-		pw.printf("<definition>%s</definition>\n",
-				esc(ae.getDefinition()));
-		pw.printf("<auxiliary>%s</auxiliary>\n",
-				esc(ae.getAuxiliary()));
-		pw.println("</auxiliary>");
+//		pw.println("<auxiliary>");
+//		pw.printf("<definition>%s</definition>\n",
+//				esc(ae.getDefinition()));
+//		pw.printf("<auxiliary>%s</auxiliary>\n",
+//				esc(ae.getAuxiliary()));
+//		pw.println("</auxiliary>");
 
 		pw.println("</parfait>");
 		pw.flush();
@@ -145,6 +148,7 @@ public final class SerializeParfaitXML {
 
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		pw.println("<parfait>");
+		pw.printf("<package>%s</package>\n", esc(s));
 		pw.println("</parfait>");
 		pw.flush();
 		return sw.toString();

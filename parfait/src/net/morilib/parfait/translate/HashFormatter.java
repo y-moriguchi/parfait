@@ -15,6 +15,7 @@
  */
 package net.morilib.parfait.translate;
 
+import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.Map;
 
@@ -42,6 +43,25 @@ public interface HashFormatter {
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type);
+
+	/**
+	 * 
+	 * @param wr
+	 * @param rd
+	 * @param hf
+	 * @param columns
+	 * @param pluslen
+	 * @param ignoreCase
+	 * @param name
+	 * @param map
+	 * @param defaultAction
+	 * @param type
+	 * @return
+	 */
+	public boolean replace(PrintWriter wr, BufferedReader rd,
+			HashFormatter hf, String columns, boolean pluslen,
+			boolean ignoreCase, String name, Map<String, String> map,
+			String defaultAction, String type);
 
 	/**
 	 * 

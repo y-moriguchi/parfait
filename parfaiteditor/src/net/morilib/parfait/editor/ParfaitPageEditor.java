@@ -15,8 +15,12 @@
  */
 package net.morilib.parfait.editor;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
@@ -53,8 +57,8 @@ public class ParfaitPageEditor extends FormEditor {
 
 	//
 	private ParfaitKeywordsEditor keywords;
-	private DescriptionEditor description;
-	private AuxiliaryCodeEditor auxiliary;
+//	private DescriptionEditor description;
+//	private AuxiliaryCodeEditor auxiliary;
 	private OptionsEditor options;
 
 	/**
@@ -69,22 +73,6 @@ public class ParfaitPageEditor extends FormEditor {
 	 * 
 	 * @return
 	 */
-	public DescriptionEditor getDescription() {
-		return description;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public AuxiliaryCodeEditor getAuxiliary() {
-		return auxiliary;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
 	public OptionsEditor getOptions() {
 		return options;
 	}
@@ -93,14 +81,14 @@ public class ParfaitPageEditor extends FormEditor {
 	protected void addPages() {
 		try {
 			keywords = new ParfaitKeywordsEditor(this);
-			description = new DescriptionEditor(this);
-			auxiliary = new AuxiliaryCodeEditor(this);
+//			description = new DescriptionEditor(this);
+//			auxiliary = new AuxiliaryCodeEditor(this);
 			options = new OptionsEditor(this);
 
 			addPage(keywords);
 			addPage(options);
-			addPage(description);
-			addPage(auxiliary);
+//			addPage(description);
+//			addPage(auxiliary);
 		} catch(PartInitException e) {
 			e.printStackTrace();
 		}
@@ -132,23 +120,44 @@ public class ParfaitPageEditor extends FormEditor {
 
 	//
 	private void convert(IFile f, IFile g, HashFormatter hf,
-			IProgressMonitor mon) throws CoreException {
+			IProgressMonitor mon) throws CoreException, IOException {
 		ByteArrayOutputStream bot = new ByteArrayOutputStream();
+		ByteArrayOutputStream bo2 = null;
+		BufferedInputStream in1 = null;
 		ByteArrayInputStream bin;
+		BufferedReader rd1 = null;
+		byte[] a = new byte[1024];
 		PrintWriter p;
 		IMarker m;
 		String n;
+		int l;
 
 		try {
 			p = new PrintWriter(new OutputStreamWriter(bot), true);
 			n = g.getName().replaceFirst("\\.[^\\.]+$", "");
+			if(options.isInject() && g.exists()) {
+				bo2 = new ByteArrayOutputStream();
+				try {
+					in1 = new BufferedInputStream(g.getContents());
+					while((l = in1.read(a)) >= 0) {
+						bo2.write(a, 0, l);
+					}
+				} finally {
+					if(in1 != null) {
+						in1.close();
+					}
+				}
+				rd1 = new BufferedReader(new InputStreamReader(
+						new ByteArrayInputStream(bo2.toByteArray())));
+			}
+
 			if(keywords.getKeywordList().size() == 0) {
 				m = f.createMarker(IMarker.PROBLEM);
 				m.setAttribute(IMarker.SEVERITY,
 						IMarker.SEVERITY_ERROR);
 				m.setAttribute(IMarker.MESSAGE,
 						"There are no keywords");
-			} else if(ConvertToTargetFile.output(hf, p, n, this)) {
+			} else if(ConvertToTargetFile.output(hf, p, n, this, rd1)) {
 				p.close();
 				bin = new ByteArrayInputStream(bot.toByteArray());
 				if(g.exists()) {
@@ -221,10 +230,9 @@ public class ParfaitPageEditor extends FormEditor {
 				hf = getTestFormatter();
 				convert(f, getFile(hf), hf, mon);
 			}
-
 			keywords.setDirty(false);
-			description.setDirty(false);
-			auxiliary.setDirty(false);
+//			description.setDirty(false);
+//			auxiliary.setDirty(false);
 			options.setDirty(false);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -283,8 +291,8 @@ public class ParfaitPageEditor extends FormEditor {
 			setInput(new FileEditorInput((IFile)f));
 
 			keywords.setDirty(false);
-			description.setDirty(false);
-			auxiliary.setDirty(false);
+//			description.setDirty(false);
+//			auxiliary.setDirty(false);
 			options.setDirty(false);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -306,3 +314,4 @@ public class ParfaitPageEditor extends FormEditor {
 	}
 
 }
+//

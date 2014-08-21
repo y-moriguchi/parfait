@@ -15,6 +15,7 @@
  */
 package net.morilib.parfait.translate;
 
+import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public class JavaEnumHashFormatter extends JavaHashFormatter {
 		JavaHashFormatterUtils.printPrologue(wr, prologue);
 		JavaHashFormatterUtils.printDescription(wr, desc);
 		JavaHashFormatterUtils.printEnumDefinition(wr, name);
+		wr.println(JavaHashFormatterUtils.REPLACE_START);
 		JavaHashFormatterUtils.printEnumList(wr, p, map);
 		JavaHashFormatterUtils.printEnum(wr, p);
 		JavaHashFormatterUtils.printAssoValues(wr, p);
@@ -48,9 +50,39 @@ public class JavaEnumHashFormatter extends JavaHashFormatter {
 		JavaHashFormatterUtils.printHashFunction(wr, p);
 		JavaHashFormatterUtils.printLookupFunction(wr, p);
 		JavaHashFormatterUtils.printMapFunction(wr, p, name);
-		JavaHashFormatterUtils.printAuxiliary(wr, aux);
 		JavaHashFormatterUtils.printValidateFunction(wr, p);
+		wr.println(JavaHashFormatterUtils.REPLACE_END);
+		JavaHashFormatterUtils.printAuxiliary(wr, aux);
 		JavaHashFormatterUtils.printClassEpilogue(wr);
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.morilib.parfait.translate.HashFormatter#replace(java.io.PrintWriter, java.io.BufferedReader, net.morilib.parfait.translate.HashFormatter, java.lang.String, boolean, boolean, java.util.Map, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean replace(PrintWriter wr, BufferedReader rd,
+			HashFormatter hf, String columns, boolean pluslen,
+			boolean ignoreCase, String name, Map<String, String> map,
+			String defaultAction, String type) {
+		PerfectHash p;
+
+		if((p = JavaHashFormatterUtils.gethash(
+				map.keySet(), columns, pluslen, ignoreCase)) == null) {
+			return false;
+		}
+		JavaHashFormatterUtils.printPrologue(wr, rd);
+		JavaHashFormatterUtils.printEnumList(wr, p, map);
+		JavaHashFormatterUtils.printEnum(wr, p);
+		JavaHashFormatterUtils.printAssoValues(wr, p);
+		JavaHashFormatterUtils.printWordlist(wr, p, map.keySet());
+		JavaHashFormatterUtils.printEnumMap(wr, p, name, map);
+		JavaHashFormatterUtils.printHashFunction(wr, p);
+		JavaHashFormatterUtils.printLookupFunction(wr, p);
+		JavaHashFormatterUtils.printMapFunction(wr, p, name);
+		JavaHashFormatterUtils.printValidateFunction(wr, p);
+		JavaHashFormatterUtils.skipToReplace(wr, rd);
+		JavaHashFormatterUtils.printEpilogue(wr, rd);
 		return true;
 	}
 

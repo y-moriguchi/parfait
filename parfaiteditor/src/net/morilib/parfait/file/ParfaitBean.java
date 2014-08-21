@@ -46,10 +46,11 @@ public class ParfaitBean {
 	KeywordsBean keywords = new KeywordsBean();
 	DescriptionBean description = new DescriptionBean();
 	AuxiliaryCodeBean auxiliary = new AuxiliaryCodeBean();
-	String language = "Java";
+	String pacage = "", language = "Java";
 	String functionType = R_DEFAULT, returnType = "";
 	String defaultAction = "", columns = "";
 	boolean automatically = true, plusLength = false;
+	boolean inject = true, create = false;
 	boolean ignoreCase = false, testCase = false;
 
 	/**
@@ -74,6 +75,14 @@ public class ParfaitBean {
 	 */
 	public AuxiliaryCodeBean getAuxiliary() {
 		return auxiliary;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getPackage() {
+		return pacage;
 	}
 
 	/**
@@ -130,6 +139,22 @@ public class ParfaitBean {
 	 */
 	public boolean isPlusLength() {
 		return plusLength;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isInject() {
+		return inject;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCreate() {
+		return create;
 	}
 
 	/**

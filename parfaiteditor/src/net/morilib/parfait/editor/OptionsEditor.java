@@ -57,8 +57,9 @@ public class OptionsEditor extends FormPage {
 	};
 
 	//
-	Text returnType, defaultAction;
+	Text pacage, returnType, defaultAction;
 	Combo language, functype;
+	Button inject, create;
 	Button ignoreCase, cAuto;
 	Text columns;
 	Combo pluslen;
@@ -67,8 +68,8 @@ public class OptionsEditor extends FormPage {
 	//
 	private ParfaitPageEditor editor;
 	private boolean dirty = false;
-	private String oldlan, oldret, olddef, oldtyp, oldcol;
-	private boolean oldaut, oldlen, oldcas, oldtes;
+	private String oldpac, oldlan, oldret, olddef, oldtyp, oldcol;
+	private boolean oldaut, oldlen, oldinj, oldcre, oldcas, oldtes;
 
 	/**
 	 * 
@@ -93,6 +94,14 @@ public class OptionsEditor extends FormPage {
 	 */
 	public String getDefaultAction() {
 		return defaultAction != null ? defaultAction.getText() : olddef;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getPackage() {
+		return pacage != null ? pacage.getText() : oldpac;
 	}
 
 	/**
@@ -192,6 +201,22 @@ public class OptionsEditor extends FormPage {
 	 * 
 	 * @return
 	 */
+	public boolean isInject() {
+		return inject != null ? inject.getSelection() : oldinj;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCreate() {
+		return create != null ? create.getSelection() : oldcre;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isIgnoreCase() {
 		return ignoreCase != null ? ignoreCase.getSelection() : oldcas;
 	}
@@ -241,6 +266,28 @@ public class OptionsEditor extends FormPage {
 		sc.setLayoutData(new GridData(GridData.FILL_BOTH));
 		cm = tk.createComposite(sc);
 		cm.setLayout(new GridLayout(2, false));
+
+		tk.createLabel(cm, "Package");
+		pacage = tk.createText(cm, "");
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		pacage.setLayoutData(gd);
+		if(oldpac != null) {
+			pacage.setText(oldpac);
+		} else {
+			oldpac = "";
+		}
+		pacage.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if(dirty) {
+					// do nothing
+				} else if(dirty = !oldpac.equals(e.data)) {
+					editor.editorDirtyStateChanged();
+				}
+			}
+
+		});
 
 		tk.createLabel(cm, "Target language");
 		language = new Combo(cm, SWT.BORDER | SWT.READ_ONLY);
@@ -315,6 +362,40 @@ public class OptionsEditor extends FormPage {
 				if(dirty) {
 					// do nothing
 				} else if(dirty = !olddef.equals(e.data)) {
+					editor.editorDirtyStateChanged();
+				}
+			}
+
+		});
+
+		tk.createLabel(cm, "");
+		inject = tk.createButton(cm, "Inject functions", SWT.RADIO);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		inject.setLayoutData(gd);
+		inject.setSelection(oldinj);
+		inject.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(!dirty && oldinj != inject.getSelection()) {
+					dirty = true;
+					editor.editorDirtyStateChanged();
+				}
+			}
+
+		});
+
+		tk.createLabel(cm, "");
+		create = tk.createButton(cm, "Create new class", SWT.RADIO);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		create.setLayoutData(gd);
+		create.setSelection(oldcre);
+		create.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(!dirty && oldcre != create.getSelection()) {
+					dirty = true;
 					editor.editorDirtyStateChanged();
 				}
 			}
@@ -424,6 +505,7 @@ public class OptionsEditor extends FormPage {
 
 	//
 	private void loadFragment(ParfaitBean act) {
+		oldpac = act.getPackage();
 		oldlan = act.getLanguage();
 		oldret = act.getReturnType();
 		olddef = act.getDefaultAction();
@@ -431,6 +513,8 @@ public class OptionsEditor extends FormPage {
 		oldaut = act.isAutomatically();
 		oldcol = act.getColumns();
 		oldlen = act.isPlusLength();
+		oldinj = act.isInject();
+		oldcre = act.isCreate();
 		oldcas = act.isIgnoreCase();
 		oldtes = act.isTestCase();
 	}

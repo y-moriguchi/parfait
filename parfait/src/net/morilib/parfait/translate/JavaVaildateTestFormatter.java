@@ -15,6 +15,7 @@
  */
 package net.morilib.parfait.translate;
 
+import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.Map;
 
@@ -33,6 +34,19 @@ public class JavaVaildateTestFormatter extends JavaTestFormatter {
 		JavaHashFormatterUtils.printTestCaseDefinition(wr, name);
 		JavaHashFormatterUtils.printValidateTestCase(wr, name, map);
 		JavaHashFormatterUtils.printTestCaseEpilogue(wr);
+		return true;
+	}
+
+	@Override
+	public boolean replace(PrintWriter wr, BufferedReader rd,
+			HashFormatter hf, String columns, boolean pluslen,
+			boolean ignoreCase, String name, Map<String, String> map,
+			String defaultAction, String type) {
+		JavaHashFormatterUtils.printPrologue(wr, rd);
+		JavaHashFormatterUtils.printTestCaseDefinition(wr, name);
+		JavaHashFormatterUtils.printValidateTestCase(wr, name, map);
+		JavaHashFormatterUtils.skipToReplace(wr, rd);
+		JavaHashFormatterUtils.printEpilogue(wr, rd);
 		return true;
 	}
 

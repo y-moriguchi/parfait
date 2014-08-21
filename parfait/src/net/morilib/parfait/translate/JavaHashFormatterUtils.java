@@ -15,6 +15,8 @@
  */
 package net.morilib.parfait.translate;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,6 +27,18 @@ import net.morilib.parfait.core.PerfectHash;
 import net.morilib.parfait.core.PermutationInclementor;
 
 public final class JavaHashFormatterUtils {
+
+	/**
+	 * 
+	 */
+	public static final String REPLACE_START =
+			"\t/* @@@ Parfait-replace-START */";
+
+	/**
+	 * 
+	 */
+	public static final String REPLACE_END =
+			"\t/* @@@ Parfait-replace-END */";
 
 	//
 	private static final Pattern RET = Pattern.compile(
@@ -481,6 +495,66 @@ public final class JavaHashFormatterUtils {
 
 	public static void printTestCaseEpilogue(PrintWriter wr) {
 		wr.println("}");
+	}
+
+	/**
+	 * 
+	 * @param wr
+	 * @param rd
+	 */
+	public static void printPrologue(PrintWriter wr,
+			BufferedReader rd) {
+		String s;
+
+		try {
+			while((s = rd.readLine()) != null) {
+				wr.println(s);
+				if(s.equals(JavaHashFormatterUtils.REPLACE_START)) {
+					return;
+				}
+			}
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 
+	 * @param wr
+	 * @param rd
+	 */
+	public static void skipToReplace(PrintWriter wr,
+			BufferedReader rd) {
+		String s;
+
+		try {
+			while((s = rd.readLine()) != null) {
+				if(s.equals(JavaHashFormatterUtils.REPLACE_END)) {
+					wr.println(s);
+					return;
+				}
+			}
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 
+	 * @param wr
+	 * @param rd
+	 */
+	public static void printEpilogue(PrintWriter wr,
+			BufferedReader rd) {
+		String s;
+
+		try {
+			while((s = rd.readLine()) != null) {
+				wr.println(s);
+			}
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

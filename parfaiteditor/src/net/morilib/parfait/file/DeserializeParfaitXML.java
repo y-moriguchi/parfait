@@ -186,7 +186,9 @@ public final class DeserializeParfaitXML {
 		nl = doc.getChildNodes().item(0).getChildNodes();
 		for(int k = 0; k < nl.getLength(); k++) {
 			nd = nl.item(k);
-			if(nd.getNodeName().equals("target-language")) {
+			if(nd.getNodeName().equals("package")) {
+				mb.pacage = readTextNode(nd).trim();
+			} else if(nd.getNodeName().equals("target-language")) {
 				mb.language = readTextNode(nd).trim();
 			} else if(nd.getNodeName().equals("function-type")) {
 				mb.functionType = readTextNode(nd).trim();
@@ -194,6 +196,10 @@ public final class DeserializeParfaitXML {
 				mb.returnType = readTextNode(nd).trim();
 			} else if(nd.getNodeName().equals("default-action")) {
 				mb.defaultAction = readTextNode(nd).trim();
+			} else if(nd.getNodeName().equals("inject")) {
+				mb.inject = "true".equals(readTextNode(nd).trim());
+			} else if(nd.getNodeName().equals("create")) {
+				mb.create = "true".equals(readTextNode(nd).trim());
 			} else if(nd.getNodeName().equals("ignore-case")) {
 				mb.ignoreCase = "true".equals(readTextNode(nd).trim());
 			} else if(nd.getNodeName().equals("test-case")) {
