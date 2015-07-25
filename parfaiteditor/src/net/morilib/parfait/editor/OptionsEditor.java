@@ -45,6 +45,10 @@ import org.eclipse.ui.forms.widgets.Section;
 public class OptionsEditor extends FormPage {
 
 	//
+	public static final int L_JAVA = 0;
+	public static final int L_CSHARP = 1;
+
+	//
 	private static final int C_EXECUTE = 0;
 	private static final int C_MAP     = 1;
 	private static final int C_ENUM    = 2;
@@ -160,6 +164,14 @@ public class OptionsEditor extends FormPage {
 	 */
 	public boolean isEnum() {
 		return ParfaitBean.R_ENUM.equals(getType());
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getLanguageNo() {
+		return language.getSelectionIndex();
 	}
 
 	//
@@ -292,6 +304,7 @@ public class OptionsEditor extends FormPage {
 		tk.createLabel(cm, "Target language");
 		language = new Combo(cm, SWT.BORDER | SWT.READ_ONLY);
 		language.add("Java");
+		language.add("C#");
 		language.select(0);
 
 		tk.createLabel(cm, "Function Type");

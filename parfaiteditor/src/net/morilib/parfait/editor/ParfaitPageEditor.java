@@ -26,13 +26,16 @@ import java.io.PrintWriter;
 
 import net.morilib.parfait.file.ConvertToTargetFile;
 import net.morilib.parfait.file.SerializeParfaitXML;
+import net.morilib.parfait.translate.CSharpPrintMethod;
+import net.morilib.parfait.translate.EnumHashFormatter;
+import net.morilib.parfait.translate.ExecuteHashFormatter;
 import net.morilib.parfait.translate.HashFormatter;
-import net.morilib.parfait.translate.JavaEnumHashFormatter;
-import net.morilib.parfait.translate.JavaExecuteHashFormatter;
-import net.morilib.parfait.translate.JavaMapHashFormatter;
-import net.morilib.parfait.translate.JavaMapTestFormatter;
-import net.morilib.parfait.translate.JavaVaildateTestFormatter;
-import net.morilib.parfait.translate.JavaValidateHashFormatter;
+import net.morilib.parfait.translate.JavaPrintMethod;
+import net.morilib.parfait.translate.LanguagePrintMethod;
+import net.morilib.parfait.translate.MapHashFormatter;
+import net.morilib.parfait.translate.MapTestFormatter;
+import net.morilib.parfait.translate.VaildateTestFormatter;
+import net.morilib.parfait.translate.ValidateHashFormatter;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -99,7 +102,7 @@ public class ParfaitPageEditor extends FormEditor {
 	 * @param ext
 	 * @return
 	 */
-	public IFile getFile(IFile f, HashFormatter hf) {
+	public IFile getFile(IFile f, LanguagePrintMethod hf) {
 		String n;
 
 		n = hf.getTargetFilename(f.getName());
@@ -111,7 +114,7 @@ public class ParfaitPageEditor extends FormEditor {
 	 * @param ext
 	 * @return
 	 */
-	public IFile getFile(HashFormatter hf) {
+	public IFile getFile(LanguagePrintMethod hf) {
 		IFile f;
 
 		f = ((IFileEditorInput)getEditorInput()).getFile();
@@ -119,7 +122,8 @@ public class ParfaitPageEditor extends FormEditor {
 	}
 
 	//
-	private void convert(IFile f, IFile g, HashFormatter hf,
+	private void convert(IFile f, IFile g, LanguagePrintMethod lang,
+			HashFormatter hf,
 			IProgressMonitor mon) throws CoreException, IOException {
 		ByteArrayOutputStream bot = new ByteArrayOutputStream();
 		ByteArrayOutputStream bo2 = null;
@@ -157,7 +161,8 @@ public class ParfaitPageEditor extends FormEditor {
 						IMarker.SEVERITY_ERROR);
 				m.setAttribute(IMarker.MESSAGE,
 						"There are no keywords");
-			} else if(ConvertToTargetFile.output(hf, p, n, this, rd1)) {
+			} else if(ConvertToTargetFile.output(hf, lang, p, n, this,
+					rd1)) {
 				p.close();
 				bin = new ByteArrayInputStream(bot.toByteArray());
 				if(g.exists()) {
@@ -182,13 +187,13 @@ public class ParfaitPageEditor extends FormEditor {
 
 	HashFormatter getHashFormatter() {
 		if(options.isAction()) {
-			return new JavaExecuteHashFormatter();
+			return new ExecuteHashFormatter();
 		} else if(options.isLookup()) {
-			return new JavaValidateHashFormatter();
+			return new ValidateHashFormatter();
 		} else if(options.isEnum()) {
-			return new JavaEnumHashFormatter();
+			return new EnumHashFormatter();
 		} else if(options.isMap()) {
-			return new JavaMapHashFormatter();
+			return new MapHashFormatter();
 		} else {
 			throw new RuntimeException();
 		}
@@ -196,14 +201,25 @@ public class ParfaitPageEditor extends FormEditor {
 
 	HashFormatter getTestFormatter() {
 		if(options.isAction()) {
-			return new JavaVaildateTestFormatter();
+			return new VaildateTestFormatter();
 		} else if(options.isLookup()) {
-			return new JavaVaildateTestFormatter();
+			return new VaildateTestFormatter();
 		} else if(options.isEnum()) {
-			return new JavaVaildateTestFormatter();
+			return new VaildateTestFormatter();
 		} else if(options.isMap()) {
-			return new JavaMapTestFormatter();
+			return new MapTestFormatter();
 		} else {
+			throw new RuntimeException();
+		}
+	}
+
+	LanguagePrintMethod getLanguagePrintMethod() {
+		switch(options.getLanguageNo()) {
+		case OptionsEditor.L_JAVA:
+			return new JavaPrintMethod();
+		case OptionsEditor.L_CSHARP:
+			return new CSharpPrintMethod();
+		default:
 			throw new RuntimeException();
 		}
 	}
@@ -214,6 +230,7 @@ public class ParfaitPageEditor extends FormEditor {
 	@Override
 	public void doSave(IProgressMonitor mon) {
 		ByteArrayOutputStream bot = new ByteArrayOutputStream();
+		LanguagePrintMethod lang;
 		HashFormatter hf;
 		IFile f = null;
 
@@ -225,10 +242,11 @@ public class ParfaitPageEditor extends FormEditor {
 			f.deleteMarkers(IMarker.PROBLEM, true,
 					IResource.DEPTH_INFINITE);
 			hf = getHashFormatter();
-			convert(f, getFile(hf), hf, mon);
+			lang = getLanguagePrintMethod();
+			convert(f, getFile(lang), lang, hf, mon);
 			if(options.isTestCase()) {
 				hf = getTestFormatter();
-				convert(f, getFile(hf), hf, mon);
+				convert(f, getFile(lang), lang, hf, mon);
 			}
 			keywords.setDirty(false);
 //			description.setDirty(false);
@@ -263,6 +281,7 @@ public class ParfaitPageEditor extends FormEditor {
 
 			public void execute(
 					final IProgressMonitor mon) throws CoreException {
+				LanguagePrintMethod lang;
 				ByteArrayOutputStream b;
 				HashFormatter hf;
 
@@ -273,10 +292,11 @@ public class ParfaitPageEditor extends FormEditor {
 					f.create(new ByteArrayInputStream(b.toByteArray()),
 							true, mon);
 					hf = getHashFormatter();
-					convert(f, getFile(f, hf), hf, mon);
+					lang = getLanguagePrintMethod();
+					convert(f, getFile(f, lang), lang, hf, mon);
 					if(options.isTestCase()) {
 						hf = getTestFormatter();
-						convert(f, getFile(hf), hf, mon);
+						convert(f, getFile(lang), lang, hf, mon);
 					}
 				} catch(Exception e) {
 					e.printStackTrace();

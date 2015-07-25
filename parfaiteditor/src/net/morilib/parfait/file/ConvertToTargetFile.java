@@ -7,6 +7,7 @@ import java.util.Map;
 
 import net.morilib.parfait.editor.ParfaitPageEditor;
 import net.morilib.parfait.translate.HashFormatter;
+import net.morilib.parfait.translate.LanguagePrintMethod;
 
 public final class ConvertToTargetFile {
 
@@ -29,7 +30,8 @@ public final class ConvertToTargetFile {
 	 * @param rd
 	 * @return
 	 */
-	public static boolean output(HashFormatter hf, PrintWriter wr,
+	public static boolean output(HashFormatter hf,
+			LanguagePrintMethod lang, PrintWriter wr,
 			String name, ParfaitPageEditor ed, BufferedReader rd) {
 		String license, rettype, defAction, prologue, desc, aux, col;
 		Map<String, String> map;
@@ -56,11 +58,11 @@ public final class ConvertToTargetFile {
 		}
 
 		if(rd == null) {
-			return hf.print(wr, hf, col, plen, icase, name, map,
+			return hf.print(wr, lang, hf, col, plen, icase, name, map,
 					defAction, license, prologue, desc, aux, rettype);
 		} else {
-			return hf.replace(wr, rd, hf, col, plen, icase, name, map,
-					defAction, rettype);
+			return hf.replace(wr, rd, lang, hf, col, plen, icase, name,
+					map, defAction, rettype);
 		}
 	}
 
