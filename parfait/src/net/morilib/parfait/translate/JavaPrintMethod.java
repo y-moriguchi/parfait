@@ -18,26 +18,22 @@ package net.morilib.parfait.translate;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.morilib.parfait.core.PerfectHash;
 import net.morilib.parfait.core.PermutationInclementor;
 
-public final class JavaHashFormatterUtils {
+public final class JavaPrintMethod implements LanguagePrintMethod {
 
-	/**
-	 * 
-	 */
-	public static final String REPLACE_START =
+	//
+	private static final String REPLACE_START =
 			"\t/* @@@ Parfait-replace-START */";
 
-	/**
-	 * 
-	 */
-	public static final String REPLACE_END =
+	//
+	private static final String REPLACE_END =
 			"\t/* @@@ Parfait-replace-END */";
 
 	//
@@ -45,26 +41,30 @@ public final class JavaHashFormatterUtils {
 			"(.*\n)?[ \t]*return[^\n]+");
 
 	//
-	private JavaHashFormatterUtils() {}
+	private static final Pattern P1 = Pattern.compile(
+			"(.+)\\.[A-Za-z0-9]+");
 
 	//
-	static PerfectHash gethash(Collection<String> it,
-			String columns, boolean pluslen, boolean ic) {
-		PermutationInclementor i;
-		int x = -1;
+	private String cap(String s) {
+		char[] a;
 
-		if(columns != null) {
-			for(String s : it) {
-				x = x < s.length() ? s.length() : x;
-			}
-			i = PermutationInclementor.newInstance(columns, x);
-			return PerfectHash.chooseKeys(1, i, pluslen, ic, it);
-		} else {
-			return PerfectHash.chooseKeys(1, ic, it);
-		}
+		a = s.toCharArray();
+		a[0] = Character.toUpperCase(a[0]);
+		return new String(a);
 	}
 
-	public static void printLicense(PrintWriter wr, String s) {
+	public String getTargetFilename(String n) {
+		Matcher m;
+
+		if((m = P1.matcher(n)).matches()) {
+			n = cap(m.group(1)) + ".java";
+		} else {
+			n = cap(n) + ".java";
+		}
+		return n;
+	}
+
+	public void printLicense(PrintWriter wr, String s) {
 		wr.println("/*");
 		for(String t : s.split("\n")) {
 			wr.printf(" * %s\n", t.trim());
@@ -72,11 +72,11 @@ public final class JavaHashFormatterUtils {
 		wr.println(" */");
 	}
 
-	public static void printPrologue(PrintWriter wr, String s) {
+	public void printPrologue(PrintWriter wr, String s) {
 		wr.println(s);
 	}
 
-	public static void printDescription(PrintWriter wr, String s) {
+	public void printDescription(PrintWriter wr, String s) {
 		wr.println("/**");
 		for(String t : s.split("\n")) {
 			wr.printf(" * %s\n", t.trim());
@@ -84,7 +84,7 @@ public final class JavaHashFormatterUtils {
 		wr.println(" */");
 	}
 
-	public static void printClassDefinition(PrintWriter wr,
+	public void printClassDefinition(PrintWriter wr,
 			String className) {
 		wr.printf("public final class %s {\n", className);
 		wr.println();
@@ -92,13 +92,13 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printEnumDefinition(PrintWriter wr,
+	public void printEnumDefinition(PrintWriter wr,
 			String className) {
 		wr.printf("public enum %s {\n", className);
 		wr.println();
 	}
 
-	public static void printEnumList(PrintWriter wr, PerfectHash ph,
+	public void printEnumList(PrintWriter wr, PerfectHash ph,
 			Map<String, String> vs) {
 		for(Map.Entry<String, String> v : vs.entrySet()) {
 			wr.printf("\t%s,\n", v.getValue());
@@ -107,7 +107,7 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printEnum(PrintWriter wr, PerfectHash ph) {
+	public void printEnum(PrintWriter wr, PerfectHash ph) {
 		wr.printf("\tpublic static final int TOTAL_KEYWORDS = %d;\n",
 				ph.getTotalKeywords());
 		wr.printf("\tpublic static final int MIN_WORD_LENGTH = %d;\n",
@@ -125,7 +125,7 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printAssoValues(PrintWriter wr,
+	public void printAssoValues(PrintWriter wr,
 			PerfectHash ph) {
 		String d = "";
 
@@ -148,7 +148,7 @@ public final class JavaHashFormatterUtils {
 		return t;
 	}
 
-	public static void printWordlist(PrintWriter wr, PerfectHash ph,
+	public void printWordlist(PrintWriter wr, PerfectHash ph,
 			Iterable<String> vs) {
 		Map<Integer, String> m = new HashMap<Integer, String>();
 
@@ -165,27 +165,30 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printMappedWordlist(PrintWriter wr,
-			PerfectHash ph, Map<String, String> vs) {
+	public void printMappedWordlist(PrintWriter wr,
+			PerfectHash ph, Map<String, String> vs, String type) {
 		Map<Integer, String> m = new HashMap<Integer, String>();
 
 		for(Map.Entry<String, String> s : vs.entrySet()) {
 			m.put(ph.hashCode(s.getKey()), esc(s.getValue()));
 		}
 
-		wr.println("\tprivate static String[] mapped_wordlist = new String[] {");
+		wr.printf("\tprivate static %s[] mapped_wordlist = new String[] {\n",
+				type);
 		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
-			if(m.containsKey(k)) {
+			if(!m.containsKey(k)) {
+				wr.printf("\t\tnull,\n");
+			} else if(type.equals("String")) {
 				wr.printf("\t\t\"%s\",\n", m.get(k));
 			} else {
-				wr.printf("\t\tnull,\n");
+				wr.printf("\t\t%s,\n", m.get(k));
 			}
 		}
 		wr.println("\n\t};");
 		wr.println();
 	}
 
-	public static void printEnumMap(PrintWriter wr, PerfectHash ph,
+	public void printEnumMap(PrintWriter wr, PerfectHash ph,
 			String enumName, Map<String, String> vs) {
 		Map<Integer, String> m = new HashMap<Integer, String>();
 
@@ -206,7 +209,7 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printHashFunction(PrintWriter wr,
+	public void printHashFunction(PrintWriter wr,
 			PerfectHash ph) {
 		PermutationInclementor p = ph.getPermutation();
 		String d = "\t\treturn (";
@@ -279,7 +282,7 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printLookupFunction(PrintWriter wr,
+	public void printLookupFunction(PrintWriter wr,
 			PerfectHash ph) {
 		wr.println("\tpublic static String lookup(int l) {");
 		wr.println("\t\tString s;");
@@ -296,7 +299,7 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printExecuteFunction(PrintWriter wr,
+	public void printExecuteFunction(PrintWriter wr,
 			PerfectHash ph, String type, Map<String, String> vs,
 			String def) {
 		Map<Integer, String> m = new HashMap<Integer, String>();
@@ -349,7 +352,7 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printMapFunction(PrintWriter wr, PerfectHash ph,
+	public void printMapFunction(PrintWriter wr, PerfectHash ph,
 			String type) {
 		wr.printf ("\tpublic static %s map(String key) {\n", type);
 		wr.printf ("\t\tString s;\n");
@@ -385,13 +388,13 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printAuxiliary(PrintWriter wr, String s) {
+	public void printAuxiliary(PrintWriter wr, String s) {
 		for(String t : s.split("\n")) {
 			wr.printf("\t%s\n", t.trim());
 		}
 	}
 
-	public static void printValidateFunction(PrintWriter wr,
+	public void printValidateFunction(PrintWriter wr,
 			PerfectHash ph) {
 		wr.println("\tpublic static boolean isValid(String l) {");
 		wr.println("\t\tString s;");
@@ -412,18 +415,18 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printClassEpilogue(PrintWriter wr) {
+	public void printClassEpilogue(PrintWriter wr) {
 		wr.println("}");
 	}
 
-	public static void printTestCaseDefinition(PrintWriter wr,
+	public void printTestCaseDefinition(PrintWriter wr,
 			String className) {
 		wr.printf("public class %s extends junit.framework.TestCase {\n",
 				className);
 		wr.println();
 	}
 
-	public static void printMapTestCase(PrintWriter wr,
+	public void printMapTestCase(PrintWriter wr,
 			String className, Map<String, String> vs) {
 		String s, v;
 
@@ -458,7 +461,7 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printValidateTestCase(PrintWriter wr,
+	public void printValidateTestCase(PrintWriter wr,
 			String className, Map<String, String> vs) {
 		String s, v;
 
@@ -493,7 +496,7 @@ public final class JavaHashFormatterUtils {
 		wr.println();
 	}
 
-	public static void printTestCaseEpilogue(PrintWriter wr) {
+	public void printTestCaseEpilogue(PrintWriter wr) {
 		wr.println("}");
 	}
 
@@ -502,14 +505,13 @@ public final class JavaHashFormatterUtils {
 	 * @param wr
 	 * @param rd
 	 */
-	public static void printPrologue(PrintWriter wr,
-			BufferedReader rd) {
+	public void printPrologue(PrintWriter wr, BufferedReader rd) {
 		String s;
 
 		try {
 			while((s = rd.readLine()) != null) {
 				wr.println(s);
-				if(s.equals(JavaHashFormatterUtils.REPLACE_START)) {
+				if(s.equals(JavaPrintMethod.REPLACE_START)) {
 					return;
 				}
 			}
@@ -523,13 +525,12 @@ public final class JavaHashFormatterUtils {
 	 * @param wr
 	 * @param rd
 	 */
-	public static void skipToReplace(PrintWriter wr,
-			BufferedReader rd) {
+	public void skipToReplace(PrintWriter wr, BufferedReader rd) {
 		String s;
 
 		try {
 			while((s = rd.readLine()) != null) {
-				if(s.equals(JavaHashFormatterUtils.REPLACE_END)) {
+				if(s.equals(JavaPrintMethod.REPLACE_END)) {
 					wr.println(s);
 					return;
 				}
@@ -544,8 +545,7 @@ public final class JavaHashFormatterUtils {
 	 * @param wr
 	 * @param rd
 	 */
-	public static void printEpilogue(PrintWriter wr,
-			BufferedReader rd) {
+	public void printEpilogue(PrintWriter wr, BufferedReader rd) {
 		String s;
 
 		try {
@@ -555,6 +555,16 @@ public final class JavaHashFormatterUtils {
 		} catch(IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public void printReplaceStart(PrintWriter wr) {
+		wr.println(JavaPrintMethod.REPLACE_START);
+	}
+
+	@Override
+	public void printReplaceEnd(PrintWriter wr) {
+		wr.println(JavaPrintMethod.REPLACE_END);
 	}
 
 }

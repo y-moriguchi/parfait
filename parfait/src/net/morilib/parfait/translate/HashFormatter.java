@@ -38,7 +38,7 @@ public interface HashFormatter {
 	 * @param type
 	 * @return
 	 */
-	public boolean print(PrintWriter wr,
+	public boolean print(PrintWriter wr, LanguagePrintMethod lang,
 			HashFormatter hf, String columns, boolean pluslen,
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
@@ -59,15 +59,8 @@ public interface HashFormatter {
 	 * @return
 	 */
 	public boolean replace(PrintWriter wr, BufferedReader rd,
-			HashFormatter hf, String columns, boolean pluslen,
-			boolean ignoreCase, String name, Map<String, String> map,
-			String defaultAction, String type);
-
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public String getTargetFilename(String s);
+			LanguagePrintMethod lang, HashFormatter hf, String columns,
+			boolean pluslen, boolean ignoreCase, String name,
+			Map<String, String> map, String defaultAction, String type);
 
 }

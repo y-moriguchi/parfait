@@ -21,38 +21,38 @@ import java.util.Map;
 
 import net.morilib.parfait.core.PerfectHash;
 
-public class JavaExecuteHashFormatter extends JavaHashFormatter {
+public class MapHashFormatter implements HashFormatter {
 
 	/* (non-Javadoc)
 	 * @see net.morilib.parfait.translate.HashFormatter#print(java.io.PrintWriter, net.morilib.parfait.translate.HashFormatter, java.lang.String, boolean, boolean, java.lang.String, java.util.Map, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	public boolean print(PrintWriter wr,
+	public boolean print(PrintWriter wr, LanguagePrintMethod lang,
 			HashFormatter hf, String columns, boolean pluslen,
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type) {
 		PerfectHash p;
 
-		if((p = JavaHashFormatterUtils.gethash(
+		if((p = ParfaitTranslateUtils.gethash(
 				map.keySet(), columns, pluslen, ignoreCase)) == null) {
 			return false;
 		}
-		JavaHashFormatterUtils.printLicense(wr, license);
-		JavaHashFormatterUtils.printPrologue(wr, prologue);
-		JavaHashFormatterUtils.printDescription(wr, desc);
-		JavaHashFormatterUtils.printClassDefinition(wr, name);
-		wr.println(JavaHashFormatterUtils.REPLACE_START);
-		JavaHashFormatterUtils.printEnum(wr, p);
-		JavaHashFormatterUtils.printAssoValues(wr, p);
-		JavaHashFormatterUtils.printWordlist(wr, p, map.keySet());
-		JavaHashFormatterUtils.printHashFunction(wr, p);
-		JavaHashFormatterUtils.printLookupFunction(wr, p);
-		JavaHashFormatterUtils.printExecuteFunction(wr, p, type, map,
-				defaultAction);
-		JavaHashFormatterUtils.printValidateFunction(wr, p);
-		wr.println(JavaHashFormatterUtils.REPLACE_END);
-		JavaHashFormatterUtils.printAuxiliary(wr, aux);
-		JavaHashFormatterUtils.printClassEpilogue(wr);
+		lang.printLicense(wr, license);
+		lang.printPrologue(wr, prologue);
+		lang.printDescription(wr, desc);
+		lang.printClassDefinition(wr, name);
+		lang.printReplaceStart(wr);
+		lang.printEnum(wr, p);
+		lang.printAssoValues(wr, p);
+		lang.printWordlist(wr, p, map.keySet());
+		lang.printMappedWordlist(wr, p, map, type);
+		lang.printHashFunction(wr, p);
+		lang.printLookupFunction(wr, p);
+		lang.printMapFunction(wr, p, type);
+		lang.printValidateFunction(wr, p);
+		lang.printReplaceEnd(wr);
+		lang.printAuxiliary(wr, aux);
+		lang.printClassEpilogue(wr);
 		return true;
 	}
 
@@ -61,26 +61,26 @@ public class JavaExecuteHashFormatter extends JavaHashFormatter {
 	 */
 	@Override
 	public boolean replace(PrintWriter wr, BufferedReader rd,
-			HashFormatter hf, String columns, boolean pluslen,
-			boolean ignoreCase, String name, Map<String, String> map,
-			String defaultAction, String type) {
+			LanguagePrintMethod lang, HashFormatter hf, String columns,
+			boolean pluslen, boolean ignoreCase, String name,
+			Map<String, String> map, String defaultAction, String type) {
 		PerfectHash p;
 
-		if((p = JavaHashFormatterUtils.gethash(
+		if((p = ParfaitTranslateUtils.gethash(
 				map.keySet(), columns, pluslen, ignoreCase)) == null) {
 			return false;
 		}
-		JavaHashFormatterUtils.printPrologue(wr, rd);
-		JavaHashFormatterUtils.printEnum(wr, p);
-		JavaHashFormatterUtils.printAssoValues(wr, p);
-		JavaHashFormatterUtils.printWordlist(wr, p, map.keySet());
-		JavaHashFormatterUtils.printHashFunction(wr, p);
-		JavaHashFormatterUtils.printLookupFunction(wr, p);
-		JavaHashFormatterUtils.printExecuteFunction(wr, p, type, map,
-				defaultAction);
-		JavaHashFormatterUtils.printValidateFunction(wr, p);
-		JavaHashFormatterUtils.skipToReplace(wr, rd);
-		JavaHashFormatterUtils.printEpilogue(wr, rd);
+		lang.printPrologue(wr, rd);
+		lang.printEnum(wr, p);
+		lang.printAssoValues(wr, p);
+		lang.printWordlist(wr, p, map.keySet());
+		lang.printMappedWordlist(wr, p, map, type);
+		lang.printHashFunction(wr, p);
+		lang.printLookupFunction(wr, p);
+		lang.printMapFunction(wr, p, "String");
+		lang.printValidateFunction(wr, p);
+		lang.skipToReplace(wr, rd);
+		lang.printEpilogue(wr, rd);
 		return true;
 	}
 

@@ -21,39 +21,39 @@ import java.util.Map;
 
 import net.morilib.parfait.core.PerfectHash;
 
-public class JavaEnumHashFormatter extends JavaHashFormatter {
+public class EnumHashFormatter implements HashFormatter {
 
 	/* (non-Javadoc)
 	 * @see net.morilib.parfait.translate.HashFormatter#print(java.io.PrintWriter, net.morilib.parfait.translate.HashFormatter, java.lang.String, boolean, boolean, java.lang.String, java.util.Map, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	public boolean print(PrintWriter wr,
+	public boolean print(PrintWriter wr, LanguagePrintMethod lang,
 			HashFormatter hf, String columns, boolean pluslen,
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type) {
 		PerfectHash p;
 
-		if((p = JavaHashFormatterUtils.gethash(
+		if((p = ParfaitTranslateUtils.gethash(
 				map.keySet(), columns, pluslen, ignoreCase)) == null) {
 			return false;
 		}
-		JavaHashFormatterUtils.printLicense(wr, license);
-		JavaHashFormatterUtils.printPrologue(wr, prologue);
-		JavaHashFormatterUtils.printDescription(wr, desc);
-		JavaHashFormatterUtils.printEnumDefinition(wr, name);
-		wr.println(JavaHashFormatterUtils.REPLACE_START);
-		JavaHashFormatterUtils.printEnumList(wr, p, map);
-		JavaHashFormatterUtils.printEnum(wr, p);
-		JavaHashFormatterUtils.printAssoValues(wr, p);
-		JavaHashFormatterUtils.printWordlist(wr, p, map.keySet());
-		JavaHashFormatterUtils.printEnumMap(wr, p, name, map);
-		JavaHashFormatterUtils.printHashFunction(wr, p);
-		JavaHashFormatterUtils.printLookupFunction(wr, p);
-		JavaHashFormatterUtils.printMapFunction(wr, p, name);
-		JavaHashFormatterUtils.printValidateFunction(wr, p);
-		wr.println(JavaHashFormatterUtils.REPLACE_END);
-		JavaHashFormatterUtils.printAuxiliary(wr, aux);
-		JavaHashFormatterUtils.printClassEpilogue(wr);
+		lang.printLicense(wr, license);
+		lang.printPrologue(wr, prologue);
+		lang.printDescription(wr, desc);
+		lang.printEnumDefinition(wr, name);
+		lang.printReplaceStart(wr);
+		lang.printEnumList(wr, p, map);
+		lang.printEnum(wr, p);
+		lang.printAssoValues(wr, p);
+		lang.printWordlist(wr, p, map.keySet());
+		lang.printEnumMap(wr, p, name, map);
+		lang.printHashFunction(wr, p);
+		lang.printLookupFunction(wr, p);
+		lang.printMapFunction(wr, p, name);
+		lang.printValidateFunction(wr, p);
+		lang.printReplaceEnd(wr);
+		lang.printAuxiliary(wr, aux);
+		lang.printClassEpilogue(wr);
 		return true;
 	}
 
@@ -62,27 +62,27 @@ public class JavaEnumHashFormatter extends JavaHashFormatter {
 	 */
 	@Override
 	public boolean replace(PrintWriter wr, BufferedReader rd,
-			HashFormatter hf, String columns, boolean pluslen,
-			boolean ignoreCase, String name, Map<String, String> map,
-			String defaultAction, String type) {
+			LanguagePrintMethod lang, HashFormatter hf, String columns,
+			boolean pluslen, boolean ignoreCase, String name,
+			Map<String, String> map, String defaultAction, String type) {
 		PerfectHash p;
 
-		if((p = JavaHashFormatterUtils.gethash(
+		if((p = ParfaitTranslateUtils.gethash(
 				map.keySet(), columns, pluslen, ignoreCase)) == null) {
 			return false;
 		}
-		JavaHashFormatterUtils.printPrologue(wr, rd);
-		JavaHashFormatterUtils.printEnumList(wr, p, map);
-		JavaHashFormatterUtils.printEnum(wr, p);
-		JavaHashFormatterUtils.printAssoValues(wr, p);
-		JavaHashFormatterUtils.printWordlist(wr, p, map.keySet());
-		JavaHashFormatterUtils.printEnumMap(wr, p, name, map);
-		JavaHashFormatterUtils.printHashFunction(wr, p);
-		JavaHashFormatterUtils.printLookupFunction(wr, p);
-		JavaHashFormatterUtils.printMapFunction(wr, p, name);
-		JavaHashFormatterUtils.printValidateFunction(wr, p);
-		JavaHashFormatterUtils.skipToReplace(wr, rd);
-		JavaHashFormatterUtils.printEpilogue(wr, rd);
+		lang.printPrologue(wr, rd);
+		lang.printEnumList(wr, p, map);
+		lang.printEnum(wr, p);
+		lang.printAssoValues(wr, p);
+		lang.printWordlist(wr, p, map.keySet());
+		lang.printEnumMap(wr, p, name, map);
+		lang.printHashFunction(wr, p);
+		lang.printLookupFunction(wr, p);
+		lang.printMapFunction(wr, p, name);
+		lang.printValidateFunction(wr, p);
+		lang.skipToReplace(wr, rd);
+		lang.printEpilogue(wr, rd);
 		return true;
 	}
 

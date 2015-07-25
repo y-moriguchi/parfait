@@ -19,36 +19,37 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.Map;
 
-public class JavaMapTestFormatter extends JavaTestFormatter {
+public class MapTestFormatter implements HashFormatter {
 
 	/* (non-Javadoc)
 	 * @see net.morilib.parfait.translate.HashFormatter#print(java.io.PrintWriter, net.morilib.parfait.translate.HashFormatter, java.lang.String, boolean, boolean, java.lang.String, java.util.Map, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	public boolean print(PrintWriter wr,
+	public boolean print(PrintWriter wr, LanguagePrintMethod lang,
 			HashFormatter hf, String columns, boolean pluslen,
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type) {
-		JavaHashFormatterUtils.printLicense(wr, license);
-		JavaHashFormatterUtils.printPrologue(wr, prologue);
-		JavaHashFormatterUtils.printTestCaseDefinition(wr, name);
-		wr.println(JavaHashFormatterUtils.REPLACE_START);
-		JavaHashFormatterUtils.printMapTestCase(wr, name, map);
-		JavaHashFormatterUtils.printValidateTestCase(wr, name, map);
-		wr.println(JavaHashFormatterUtils.REPLACE_END);
-		JavaHashFormatterUtils.printTestCaseEpilogue(wr);
+		lang.printLicense(wr, license);
+		lang.printPrologue(wr, prologue);
+		lang.printTestCaseDefinition(wr, name);
+		lang.printReplaceStart(wr);
+		lang.printMapTestCase(wr, name, map);
+		lang.printValidateTestCase(wr, name, map);
+		lang.printReplaceEnd(wr);
+		lang.printTestCaseEpilogue(wr);
 		return true;
 	}
 
 	@Override
-	public boolean replace(PrintWriter wr, BufferedReader rd, HashFormatter hf,
-			String columns, boolean pluslen, boolean ignoreCase, String name,
+	public boolean replace(PrintWriter wr, BufferedReader rd,
+			LanguagePrintMethod lang, HashFormatter hf, String columns,
+			boolean pluslen, boolean ignoreCase, String name,
 			Map<String, String> map, String defaultAction, String type) {
-		JavaHashFormatterUtils.printPrologue(wr, rd);
-		JavaHashFormatterUtils.printMapTestCase(wr, name, map);
-		JavaHashFormatterUtils.printValidateTestCase(wr, name, map);
-		JavaHashFormatterUtils.skipToReplace(wr, rd);
-		JavaHashFormatterUtils.printEpilogue(wr, rd);
+		lang.printPrologue(wr, rd);
+		lang.printMapTestCase(wr, name, map);
+		lang.printValidateTestCase(wr, name, map);
+		lang.skipToReplace(wr, rd);
+		lang.printEpilogue(wr, rd);
 		return true;
 	}
 

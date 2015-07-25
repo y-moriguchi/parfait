@@ -21,7 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.morilib.parfait.core.PerfectHash;
-import net.morilib.parfait.translate.JavaHashFormatterUtils;
+import net.morilib.parfait.translate.JavaPrintMethod;
+import net.morilib.parfait.translate.LanguagePrintMethod;
 
 public class PerfectHashFormatDrv2 {
 
@@ -46,16 +47,17 @@ public class PerfectHashFormatDrv2 {
 		p = PerfectHash.chooseKeys(1, false, l.keySet());
 
 		wr = new PrintWriter(new OutputStreamWriter(System.out), true);
-		JavaHashFormatterUtils.printLicense(wr, "");
-		JavaHashFormatterUtils.printPrologue(wr, "");
-		JavaHashFormatterUtils.printClassDefinition(wr, "TestHash");
-		JavaHashFormatterUtils.printEnum(wr, p);
-		JavaHashFormatterUtils.printAssoValues(wr, p);
-		JavaHashFormatterUtils.printWordlist(wr, p, l.keySet());
-		JavaHashFormatterUtils.printHashFunction(wr, p);
-		JavaHashFormatterUtils.printLookupFunction(wr, p);
-		JavaHashFormatterUtils.printExecuteFunction(wr, p, "void", l, null);
-		JavaHashFormatterUtils.printClassEpilogue(wr);
+		LanguagePrintMethod lang = new JavaPrintMethod();
+		lang.printLicense(wr, "");
+		lang.printPrologue(wr, "");
+		lang.printClassDefinition(wr, "TestHash");
+		lang.printEnum(wr, p);
+		lang.printAssoValues(wr, p);
+		lang.printWordlist(wr, p, l.keySet());
+		lang.printHashFunction(wr, p);
+		lang.printLookupFunction(wr, p);
+		lang.printExecuteFunction(wr, p, "void", l, null);
+		lang.printClassEpilogue(wr);
 	}
 
 }
