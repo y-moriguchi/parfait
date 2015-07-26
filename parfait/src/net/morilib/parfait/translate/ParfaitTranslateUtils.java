@@ -23,6 +23,15 @@ import net.morilib.parfait.core.PermutationInclementor;
 public class ParfaitTranslateUtils {
 
 	//
+	static String cap(String s) {
+		char[] a;
+
+		a = s.toCharArray();
+		a[0] = Character.toUpperCase(a[0]);
+		return new String(a);
+	}
+
+	//
 	static PerfectHash gethash(Collection<String> it,
 			String columns, boolean pluslen, boolean ic) {
 		PermutationInclementor i;

@@ -77,10 +77,12 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 
 	public void printClassDefinition(PrintWriter wr,
 			String className) {
-		wr.printf("public class %s\n", className);
+		String klasse = ParfaitTranslateUtils.cap(className);
+
+		wr.printf("public class %s\n", klasse);
 		wr.printf("{\n");
 		wr.println();
-		wr.printf("\tprivate %s () {}\n", className);
+		wr.printf("\tprivate %s () {}\n", klasse);
 		wr.println();
 	}
 
@@ -165,8 +167,8 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 			m.put(ph.hashCode(s.getKey()), esc(s.getValue()));
 		}
 
-		wr.printf("\tprivate static %s[] mapped_wordlist = new string[] {\n",
-				type);
+		wr.printf("\tprivate static %s[] mapped_wordlist = new %s[] {\n",
+				type, type);
 		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
 			if(!m.containsKey(k)) {
 				wr.printf("\t\tnull,\n");
@@ -234,7 +236,7 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 		}
 		wr.println("\t}");
 
-		wr.println("\n\tpublic static int hashCode(string s)\n\t{");
+		wr.println("\n\tpublic static int HashCode(string s)\n\t{");
 		wr.println("\t\tint l;");
 		wr.println();
 		wr.printf("\t\tif(s == null)  return %d;\n", out);
@@ -276,7 +278,7 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 
 	public void printLookupFunction(PrintWriter wr,
 			PerfectHash ph) {
-		wr.println("\tpublic static string lookup(int l)\n\t{");
+		wr.println("\tpublic static string Lookup(int l)\n\t{");
 		wr.println("\t\tstring s;");
 		wr.println();
 		wr.println("\t\tif(l < MIN_HASH_VALUE || l > MAX_HASH_VALUE)\n\t\t{");
@@ -301,7 +303,7 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 			m.put(ph.hashCode(s.getKey()), s.getValue());
 		}
 
-		wr.printf ("\tpublic static %s execute(string v)\n\t{\n", type);
+		wr.printf ("\tpublic static %s Execute(string v)\n\t{\n", type);
 		wr.println("\t\tstring s;");
 		wr.println("\t\tint l;");
 		wr.println();
@@ -311,7 +313,7 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 		wr.println("\t\t\t" + d);
 		wr.println("\t\t}\n\t\telse if(l > MAX_WORD_LENGTH)\n\t\t{");
 		wr.println("\t\t\t" + d);
-		wr.println("\t\t}\n\t\telse if((l = hashCode(v)) < MIN_HASH_VALUE)\n\t\t{");
+		wr.println("\t\t}\n\t\telse if((l = HashCode(v)) < MIN_HASH_VALUE)\n\t\t{");
 		wr.println("\t\t\t" + d);
 		wr.println("\t\t}\n\t\telse if(l > MAX_HASH_VALUE)\n\t\t{");
 		wr.println("\t\t\t" + d);
@@ -327,7 +329,7 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 		}
 		wr.println("\t\t\t" + d);
 		wr.println("\t\t}\n\t\telse\n\t\t{");
-		wr.println("\t\t\tswitch(hashCode(v)) {");
+		wr.println("\t\t\tswitch(HashCode(v)) {");
 		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
 			if(m.containsKey(k)) {
 				wr.printf("\t\t\tcase %d:\n", k);
@@ -348,7 +350,7 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 
 	public void printMapFunction(PrintWriter wr, PerfectHash ph,
 			String type) {
-		wr.printf ("\tpublic static %s map(string key)\n\t{\n", type);
+		wr.printf ("\tpublic static %s Map(string key)\n\t{\n", type);
 		wr.printf ("\t\tstring s;\n");
 		wr.printf ("\t\t%s r;\n", type);
 		wr.println("\t\tint l;");
@@ -359,7 +361,7 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 		wr.println("\t\t\treturn null;");
 		wr.println("\t\t}\n\t\telse if(l > MAX_WORD_LENGTH)\n\t\t{");
 		wr.println("\t\t\treturn null;");
-		wr.println("\t\t}\n\t\telse if((l = hashCode(key)) < MIN_HASH_VALUE)\n\t\t{");
+		wr.println("\t\t}\n\t\telse if((l = HashCode(key)) < MIN_HASH_VALUE)\n\t\t{");
 		wr.println("\t\t\treturn null;");
 		wr.println("\t\t}\n\t\telse if(l > MAX_HASH_VALUE)\n\t\t{");
 		wr.println("\t\t\treturn null;");
@@ -392,14 +394,14 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 
 	public void printValidateFunction(PrintWriter wr,
 			PerfectHash ph) {
-		wr.println("\tpublic static bool isValid(string l)\n\t{");
+		wr.println("\tpublic static bool IsValid(string l)\n\t{");
 		wr.println("\t\tstring s;");
 		wr.println("\t\tint x;");
 		wr.println();
 		wr.println("\t\treturn (l != null &&");
 		wr.println("\t\t\t\t(x = l.Length) <= MAX_WORD_LENGTH &&");
 		wr.println("\t\t\t\tx >= MIN_WORD_LENGTH &&");
-		wr.println("\t\t\t\t(x = hashCode(l)) <= MAX_HASH_VALUE &&");
+		wr.println("\t\t\t\t(x = HashCode(l)) <= MAX_HASH_VALUE &&");
 		wr.println("\t\t\t\tx >= MIN_HASH_VALUE &&");
 		wr.println("\t\t\t\t(s = wordlist[x - MIN_HASH_VALUE]) != null &&");
 		if(ph.isIgnoreCase()) {
@@ -561,6 +563,20 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 	@Override
 	public void printReplaceEnd(PrintWriter wr) {
 		wr.println(CSharpPrintMethod.REPLACE_END);
+	}
+
+	@Override
+	public void printPackagePrologue(PrintWriter wr, String name) {
+		if(name != null && !name.equals("")) {
+			wr.printf("namespace %s\n{\n", name);
+		}
+	}
+
+	@Override
+	public void printPackageEpilogue(PrintWriter wr, String name) {
+		if(name != null && !name.equals("")) {
+			wr.printf("}\n", name);
+		}
 	}
 
 }
