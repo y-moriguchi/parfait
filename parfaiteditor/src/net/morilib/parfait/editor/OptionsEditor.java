@@ -171,7 +171,15 @@ public class OptionsEditor extends FormPage {
 	 * @return
 	 */
 	public int getLanguageNo() {
-		return language.getSelectionIndex();
+		if(language != null) {
+			return language.getSelectionIndex();
+		} else if(oldlan.equals("Java")) {
+			return L_JAVA;
+		} else if(oldlan.equals("C#")) {
+			return L_CSHARP;
+		} else {
+			throw new RuntimeException();
+		}
 	}
 
 	//
@@ -306,6 +314,25 @@ public class OptionsEditor extends FormPage {
 		language.add("Java");
 		language.add("C#");
 		language.select(0);
+		if(oldlan == null) {
+			oldlan = "";
+		} else if(oldlan.equals("Java")) {
+			language.select(L_JAVA);
+		} else if(oldlan.equals("C#")) {
+			language.select(L_CSHARP);
+		}
+		language.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if(dirty) {
+					// do nothing
+				} else if(dirty = !oldlan.equals(getType())) {
+					editor.editorDirtyStateChanged();
+				}
+			}
+
+		});
 
 		tk.createLabel(cm, "Function Type");
 		functype = new Combo(cm, SWT.BORDER | SWT.READ_ONLY);
@@ -314,7 +341,7 @@ public class OptionsEditor extends FormPage {
 		functype.add(C_MESG[C_ENUM]);
 		functype.add(C_MESG[C_ONLY]);
 		if(oldtyp == null) {
-			olddef = "";
+			oldtyp = "";
 		} else if(oldtyp.equals(ParfaitBean.R_ACTION)) {
 			functype.select(C_EXECUTE);
 		} else if(oldtyp.equals(ParfaitBean.R_MAP)) {
@@ -333,6 +360,8 @@ public class OptionsEditor extends FormPage {
 				} else if(dirty = !olddef.equals(getType())) {
 					editor.editorDirtyStateChanged();
 				}
+				defaultAction.setEnabled(
+						functype.getSelectionIndex() == C_EXECUTE);
 			}
 
 		});
@@ -368,6 +397,8 @@ public class OptionsEditor extends FormPage {
 		} else {
 			olddef = "";
 		}
+		defaultAction.setEnabled(
+				functype.getSelectionIndex() == C_EXECUTE);
 		defaultAction.addModifyListener(new ModifyListener() {
 
 			@Override

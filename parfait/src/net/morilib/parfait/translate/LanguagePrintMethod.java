@@ -121,4 +121,18 @@ public interface LanguagePrintMethod {
 	 */
 	public void printReplaceEnd(PrintWriter wr);
 
+	/**
+	 * 
+	 * @param wr
+	 * @param name
+	 */
+	public void printPackagePrologue(PrintWriter wr, String name);
+
+	/**
+	 * 
+	 * @param wr
+	 * @param name
+	 */
+	public void printPackageEpilogue(PrintWriter wr, String name);
+
 }

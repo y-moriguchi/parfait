@@ -34,6 +34,7 @@ public final class ConvertToTargetFile {
 			LanguagePrintMethod lang, PrintWriter wr,
 			String name, ParfaitPageEditor ed, BufferedReader rd) {
 		String license, rettype, defAction, prologue, desc, aux, col;
+		String pkg;
 		Map<String, String> map;
 		boolean plen, icase;
 
@@ -44,11 +45,11 @@ public final class ConvertToTargetFile {
 		rettype   = ed.getOptions().getReturnType();
 		defAction = ed.getOptions().getDefaultAction();
 		license   = LICENSE;
-		prologue  = "package " + ed.getOptions().getPackage() + ";\n" +
-				PROLOGUE;
+		prologue  = PROLOGUE;
 		desc      = DESCRIPTION;
 		aux       = AUXILIARY;
 		icase     = ed.getOptions().isIgnoreCase();
+		pkg       = ed.getOptions().getPackage();
 		if(ed.getOptions().isAutomatically()) {
 			col  = null;
 			plen = false;
@@ -58,10 +59,10 @@ public final class ConvertToTargetFile {
 		}
 
 		if(rd == null) {
-			return hf.print(wr, lang, hf, col, plen, icase, name, map,
+			return hf.print(wr, lang, pkg, col, plen, icase, name, map,
 					defAction, license, prologue, desc, aux, rettype);
 		} else {
-			return hf.replace(wr, rd, lang, hf, col, plen, icase, name,
+			return hf.replace(wr, rd, lang, col, plen, icase, name,
 					map, defAction, rettype);
 		}
 	}

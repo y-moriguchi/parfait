@@ -25,21 +25,23 @@ public class VaildateTestFormatter implements HashFormatter {
 	 * @see net.morilib.parfait.translate.HashFormatter#print(java.io.PrintWriter, net.morilib.parfait.translate.HashFormatter, java.lang.String, boolean, boolean, java.lang.String, java.util.Map, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public boolean print(PrintWriter wr, LanguagePrintMethod lang,
-			HashFormatter hf, String columns, boolean pluslen,
+			String pkg, String columns, boolean pluslen,
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type) {
 		lang.printLicense(wr, license);
+		lang.printPackagePrologue(wr, pkg);
 		lang.printPrologue(wr, prologue);
 		lang.printTestCaseDefinition(wr, name);
 		lang.printValidateTestCase(wr, name, map);
 		lang.printTestCaseEpilogue(wr);
+		lang.printPackageEpilogue(wr, pkg);
 		return true;
 	}
 
 	@Override
 	public boolean replace(PrintWriter wr, BufferedReader rd,
-			LanguagePrintMethod lang,HashFormatter hf, String columns,
+			LanguagePrintMethod lang, String columns,
 			boolean pluslen, boolean ignoreCase, String name,
 			Map<String, String> map, String defaultAction, String type) {
 		lang.printPrologue(wr, rd);

@@ -39,7 +39,7 @@ public interface HashFormatter {
 	 * @return
 	 */
 	public boolean print(PrintWriter wr, LanguagePrintMethod lang,
-			HashFormatter hf, String columns, boolean pluslen,
+			String pkg, String columns, boolean pluslen,
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type);
@@ -59,7 +59,7 @@ public interface HashFormatter {
 	 * @return
 	 */
 	public boolean replace(PrintWriter wr, BufferedReader rd,
-			LanguagePrintMethod lang, HashFormatter hf, String columns,
+			LanguagePrintMethod lang, String columns,
 			boolean pluslen, boolean ignoreCase, String name,
 			Map<String, String> map, String defaultAction, String type);
 

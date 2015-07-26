@@ -27,7 +27,7 @@ public class EnumHashFormatter implements HashFormatter {
 	 * @see net.morilib.parfait.translate.HashFormatter#print(java.io.PrintWriter, net.morilib.parfait.translate.HashFormatter, java.lang.String, boolean, boolean, java.lang.String, java.util.Map, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public boolean print(PrintWriter wr, LanguagePrintMethod lang,
-			HashFormatter hf, String columns, boolean pluslen,
+			String pkg, String columns, boolean pluslen,
 			boolean ignoreCase, String name, Map<String, String> map,
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type) {
@@ -38,6 +38,7 @@ public class EnumHashFormatter implements HashFormatter {
 			return false;
 		}
 		lang.printLicense(wr, license);
+		lang.printPackagePrologue(wr, pkg);
 		lang.printPrologue(wr, prologue);
 		lang.printDescription(wr, desc);
 		lang.printEnumDefinition(wr, name);
@@ -54,6 +55,7 @@ public class EnumHashFormatter implements HashFormatter {
 		lang.printReplaceEnd(wr);
 		lang.printAuxiliary(wr, aux);
 		lang.printClassEpilogue(wr);
+		lang.printPackageEpilogue(wr, pkg);
 		return true;
 	}
 
@@ -62,7 +64,7 @@ public class EnumHashFormatter implements HashFormatter {
 	 */
 	@Override
 	public boolean replace(PrintWriter wr, BufferedReader rd,
-			LanguagePrintMethod lang, HashFormatter hf, String columns,
+			LanguagePrintMethod lang, String columns,
 			boolean pluslen, boolean ignoreCase, String name,
 			Map<String, String> map, String defaultAction, String type) {
 		PerfectHash p;

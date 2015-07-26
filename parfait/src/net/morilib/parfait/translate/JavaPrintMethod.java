@@ -44,22 +44,13 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 	private static final Pattern P1 = Pattern.compile(
 			"(.+)\\.[A-Za-z0-9]+");
 
-	//
-	private String cap(String s) {
-		char[] a;
-
-		a = s.toCharArray();
-		a[0] = Character.toUpperCase(a[0]);
-		return new String(a);
-	}
-
 	public String getTargetFilename(String n) {
 		Matcher m;
 
 		if((m = P1.matcher(n)).matches()) {
-			n = cap(m.group(1)) + ".java";
+			n = ParfaitTranslateUtils.cap(m.group(1)) + ".java";
 		} else {
-			n = cap(n) + ".java";
+			n = ParfaitTranslateUtils.cap(n) + ".java";
 		}
 		return n;
 	}
@@ -173,8 +164,8 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 			m.put(ph.hashCode(s.getKey()), esc(s.getValue()));
 		}
 
-		wr.printf("\tprivate static %s[] mapped_wordlist = new String[] {\n",
-				type);
+		wr.printf("\tprivate static %s[] mapped_wordlist = new %s[] {\n",
+				type, type);
 		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
 			if(!m.containsKey(k)) {
 				wr.printf("\t\tnull,\n");
@@ -565,6 +556,17 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 	@Override
 	public void printReplaceEnd(PrintWriter wr) {
 		wr.println(JavaPrintMethod.REPLACE_END);
+	}
+
+	@Override
+	public void printPackagePrologue(PrintWriter wr, String name) {
+		if(name != null && !name.equals("")) {
+			wr.printf("package %s;\n", name);
+		}
+	}
+
+	@Override
+	public void printPackageEpilogue(PrintWriter wr, String name) {
 	}
 
 }
