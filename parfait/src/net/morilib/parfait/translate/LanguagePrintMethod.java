@@ -26,19 +26,35 @@ import net.morilib.parfait.core.PerfectHash;
  */
 public interface LanguagePrintMethod {
 
+	/**
+	 * 
+	 * @param n
+	 * @return
+	 */
 	public String getTargetFilename(String n);
 
+	/**
+	 * 
+	 * @param wr
+	 * @param s
+	 */
 	public void printLicense(PrintWriter wr, String s);
 
-	public void printPrologue(PrintWriter wr, String s);
-
-	public void printDescription(PrintWriter wr, String s);
-
+	/**
+	 * 
+	 * @param wr
+	 * @param className
+	 * @param packageName
+	 * @param prologue
+	 * @param description
+	 */
 	public void printClassDefinition(PrintWriter wr,
-			String className);
+			String className, String packageName, String prologue,
+			String description);
 
 	public void printEnumDefinition(PrintWriter wr,
-			String className);
+			String className, String packageName, String prologue,
+			String description);
 
 	public void printEnumList(PrintWriter wr, PerfectHash ph,
 			Map<String, String> vs);
@@ -78,7 +94,7 @@ public interface LanguagePrintMethod {
 	public void printClassEpilogue(PrintWriter wr);
 
 	public void printTestCaseDefinition(PrintWriter wr,
-			String className);
+			String className, String packageName, String prologue);
 
 	public void printMapTestCase(PrintWriter wr,
 			String className, Map<String, String> vs);
@@ -120,13 +136,6 @@ public interface LanguagePrintMethod {
 	 * @param wr
 	 */
 	public void printReplaceEnd(PrintWriter wr);
-
-	/**
-	 * 
-	 * @param wr
-	 * @param name
-	 */
-	public void printPackagePrologue(PrintWriter wr, String name);
 
 	/**
 	 * 

@@ -37,10 +37,6 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 			"\t/* @@@ Parfait-replace-END */";
 
 	//
-	private static final Pattern RET = Pattern.compile(
-			"(.*\n)?[ \t]*return[^\n]+");
-
-	//
 	private static final Pattern P1 = Pattern.compile(
 			"(.+)\\.[A-Za-z0-9]+");
 
@@ -63,11 +59,17 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 		wr.println(" */");
 	}
 
-	public void printPrologue(PrintWriter wr, String s) {
+	private void printPackagePrologue(PrintWriter wr, String name) {
+		if(name != null && !name.equals("")) {
+			wr.printf("package %s;\n", name);
+		}
+	}
+
+	private void printPrologue(PrintWriter wr, String s) {
 		wr.println(s);
 	}
 
-	public void printDescription(PrintWriter wr, String s) {
+	private void printDescription(PrintWriter wr, String s) {
 		wr.println("/**");
 		for(String t : s.split("\n")) {
 			wr.printf(" * %s\n", t.trim());
@@ -76,7 +78,11 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 	}
 
 	public void printClassDefinition(PrintWriter wr,
-			String className) {
+			String className, String packageName, String prologue,
+			String description) {
+		printPackagePrologue(wr, packageName);
+		printPrologue(wr, prologue);
+		printDescription(wr, description);
 		wr.printf("public final class %s {\n", className);
 		wr.println();
 		wr.printf("\tprivate %s () {}\n", className);
@@ -84,7 +90,11 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 	}
 
 	public void printEnumDefinition(PrintWriter wr,
-			String className) {
+			String className, String packageName, String prologue,
+			String description) {
+		printPackagePrologue(wr, packageName);
+		printPrologue(wr, prologue);
+		printDescription(wr, description);
 		wr.printf("public enum %s {\n", className);
 		wr.println();
 	}
@@ -323,20 +333,19 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 			wr.println("\t\t} else if(!s.equals(v)) {");
 		}
 		wr.println("\t\t\t" + d);
+
 		wr.println("\t\t} else {");
-		wr.println("\t\t\tswitch(hashCode(v)) {");
+		wr.println("\t\t\tint hash = hashCode(v);");
+		String els = "if";
 		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
 			if(m.containsKey(k)) {
-				wr.printf("\t\t\tcase %d:\n", k);
+				wr.printf("\t\t\t%s(hash == %d) {\n", els, k);
 				wr.printf("\t\t\t\t%s\n", m.get(k));
-				if(!RET.matcher(m.get(k)).matches()) {
-					wr.printf("\t\t\t\tbreak;\n");
-				}
+				els = "} else if";
 			}
 		}
-		wr.println("\t\t\tdefault:");
+		wr.println("\t\t\t} else {");
 		wr.println("\t\t\t\t" + d);
-		if(!RET.matcher(d).matches())  wr.println("\t\t\t\tbreak;");
 		wr.println("\t\t\t}");
 		wr.println("\t\t}");
 		wr.println("\t}");
@@ -411,7 +420,9 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 	}
 
 	public void printTestCaseDefinition(PrintWriter wr,
-			String className) {
+			String className, String packageName, String prologue) {
+		printPackagePrologue(wr, packageName);
+		printPrologue(wr, prologue);
 		wr.printf("public class %s extends junit.framework.TestCase {\n",
 				className);
 		wr.println();
@@ -556,13 +567,6 @@ public final class JavaPrintMethod implements LanguagePrintMethod {
 	@Override
 	public void printReplaceEnd(PrintWriter wr) {
 		wr.println(JavaPrintMethod.REPLACE_END);
-	}
-
-	@Override
-	public void printPackagePrologue(PrintWriter wr, String name) {
-		if(name != null && !name.equals("")) {
-			wr.printf("package %s;\n", name);
-		}
 	}
 
 	@Override

@@ -48,9 +48,7 @@ public class PerfectHashFormatDrv {
 
 		wr = new PrintWriter(new OutputStreamWriter(System.out), true);
 		LanguagePrintMethod lang = new JavaPrintMethod();
-		lang.printLicense(wr, "");
-		lang.printPrologue(wr, "");
-		lang.printClassDefinition(wr, "TestHash");
+		lang.printClassDefinition(wr, "TestHash", null, "", "");
 		lang.printEnum(wr, p);
 		lang.printAssoValues(wr, p);
 		lang.printWordlist(wr, p, l.keySet());

@@ -38,10 +38,7 @@ public class ValidateHashFormatter implements HashFormatter {
 			return false;
 		}
 		lang.printLicense(wr, license);
-		lang.printPackagePrologue(wr, pkg);
-		lang.printPrologue(wr, prologue);
-		lang.printDescription(wr, desc);
-		lang.printClassDefinition(wr, name);
+		lang.printClassDefinition(wr, name, pkg, prologue, desc);
 		lang.printReplaceStart(wr);
 		lang.printEnum(wr, p);
 		lang.printAssoValues(wr, p);

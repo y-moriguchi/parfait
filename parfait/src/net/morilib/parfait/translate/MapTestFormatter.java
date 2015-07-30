@@ -30,9 +30,7 @@ public class MapTestFormatter implements HashFormatter {
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type) {
 		lang.printLicense(wr, license);
-		lang.printPackagePrologue(wr, pkg);
-		lang.printPrologue(wr, prologue);
-		lang.printTestCaseDefinition(wr, name);
+		lang.printTestCaseDefinition(wr, name, pkg, prologue);
 		lang.printReplaceStart(wr);
 		lang.printMapTestCase(wr, name, map);
 		lang.printValidateTestCase(wr, name, map);

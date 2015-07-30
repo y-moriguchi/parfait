@@ -30,9 +30,7 @@ public class VaildateTestFormatter implements HashFormatter {
 			String defaultAction, String license, String prologue,
 			String desc, String aux, String type) {
 		lang.printLicense(wr, license);
-		lang.printPackagePrologue(wr, pkg);
-		lang.printPrologue(wr, prologue);
-		lang.printTestCaseDefinition(wr, name);
+		lang.printTestCaseDefinition(wr, name, pkg, prologue);
 		lang.printValidateTestCase(wr, name, map);
 		lang.printTestCaseEpilogue(wr);
 		lang.printPackageEpilogue(wr, pkg);
@@ -45,7 +43,7 @@ public class VaildateTestFormatter implements HashFormatter {
 			boolean pluslen, boolean ignoreCase, String name,
 			Map<String, String> map, String defaultAction, String type) {
 		lang.printPrologue(wr, rd);
-		lang.printTestCaseDefinition(wr, name);
+		lang.printTestCaseDefinition(wr, name, null, "");
 		lang.printValidateTestCase(wr, name, map);
 		lang.skipToReplace(wr, rd);
 		lang.printEpilogue(wr, rd);

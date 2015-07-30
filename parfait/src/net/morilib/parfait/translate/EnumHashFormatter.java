@@ -38,10 +38,7 @@ public class EnumHashFormatter implements HashFormatter {
 			return false;
 		}
 		lang.printLicense(wr, license);
-		lang.printPackagePrologue(wr, pkg);
-		lang.printPrologue(wr, prologue);
-		lang.printDescription(wr, desc);
-		lang.printEnumDefinition(wr, name);
+		lang.printEnumDefinition(wr, name, pkg, prologue, desc);
 		lang.printReplaceStart(wr);
 		lang.printEnumList(wr, p, map);
 		lang.printEnum(wr, p);

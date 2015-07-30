@@ -37,10 +37,6 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 			"\t/* @@@ Parfait-replace-END */";
 
 	//
-	private static final Pattern RET = Pattern.compile(
-			"(.*\n)?[ \t]*return[^\n]+");
-
-	//
 	private static final Pattern P1 = Pattern.compile(
 			"(.+)\\.[A-Za-z0-9]+");
 
@@ -63,11 +59,17 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 		wr.println(" */");
 	}
 
-	public void printPrologue(PrintWriter wr, String s) {
+	private void printPackagePrologue(PrintWriter wr, String name) {
+		if(name != null && !name.equals("")) {
+			wr.printf("namespace %s\n{\n", name);
+		}
+	}
+
+	private void printPrologue(PrintWriter wr, String s) {
 		wr.println(s);
 	}
 
-	public void printDescription(PrintWriter wr, String s) {
+	private void printDescription(PrintWriter wr, String s) {
 		wr.println("/**");
 		for(String t : s.split("\n")) {
 			wr.printf(" * %s\n", t.trim());
@@ -76,9 +78,13 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 	}
 
 	public void printClassDefinition(PrintWriter wr,
-			String className) {
+			String className, String packageName, String prologue,
+			String description) {
 		String klasse = ParfaitTranslateUtils.cap(className);
 
+		printPrologue(wr, prologue);
+		printPackagePrologue(wr, packageName);
+		printDescription(wr, description);
 		wr.printf("public class %s\n", klasse);
 		wr.printf("{\n");
 		wr.println();
@@ -87,7 +93,11 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 	}
 
 	public void printEnumDefinition(PrintWriter wr,
-			String className) {
+			String className, String packageName, String prologue,
+			String description) {
+		printPrologue(wr, prologue);
+		printPackagePrologue(wr, packageName);
+		printDescription(wr, description);
 		wr.printf("public enum %s {\n", className);
 		wr.println();
 	}
@@ -172,7 +182,9 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
 			if(!m.containsKey(k)) {
 				wr.printf("\t\tnull,\n");
-			} else if(type.equals("String")) {
+			} else if(type.equals("string") ||
+					type.equals("String") ||
+					type.equals("System.String")) {
 				wr.printf("\t\t\"%s\",\n", m.get(k));
 			} else {
 				wr.printf("\t\t%s,\n", m.get(k));
@@ -328,20 +340,18 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 			wr.println("\t\t}\n\t\telse if(!s.Equals(v))\n\t\t{");
 		}
 		wr.println("\t\t\t" + d);
-		wr.println("\t\t}\n\t\telse\n\t\t{");
-		wr.println("\t\t\tswitch(HashCode(v)) {");
+		wr.println("\t\t}\n\t\telse\n\t\t\t{");
+		wr.println("\t\t\tint hash = HashCode(v);");
+		String els = "if";
 		for(int k = ph.getMinHashValue(); k <= ph.getMaxHashValue(); k++) {
 			if(m.containsKey(k)) {
-				wr.printf("\t\t\tcase %d:\n", k);
+				wr.printf("\t\t\t%s(hash == %d)\n\t\t\t{\n", els, k);
 				wr.printf("\t\t\t\t%s\n", m.get(k));
-				if(!RET.matcher(m.get(k)).matches()) {
-					wr.printf("\t\t\t\tbreak;\n");
-				}
 			}
+			els = "}\n\t\t\telse if";
 		}
-		wr.println("\t\t\tdefault:");
+		wr.println("\t\t\t}\n\t\t\telse\n\t\t\t{");
 		wr.println("\t\t\t\t" + d);
-		if(!RET.matcher(d).matches())  wr.println("\t\t\t\tbreak;");
 		wr.println("\t\t\t}");
 		wr.println("\t\t}");
 		wr.println("\t}");
@@ -357,7 +367,7 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 		wr.println();
 		wr.println("\t\tif(key == null)\n\t\t{");
 		wr.println("\t\t\treturn null;");
-		wr.println("\t\t}\n\t\telse if((l = key.length()) < MIN_WORD_LENGTH)\n\t\t{");
+		wr.println("\t\t}\n\t\telse if((l = key.Length) < MIN_WORD_LENGTH)\n\t\t{");
 		wr.println("\t\t\treturn null;");
 		wr.println("\t\t}\n\t\telse if(l > MAX_WORD_LENGTH)\n\t\t{");
 		wr.println("\t\t\treturn null;");
@@ -418,7 +428,7 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 	}
 
 	public void printTestCaseDefinition(PrintWriter wr,
-			String className) {
+			String className, String packageName, String prologue) {
 //		wr.printf("public class %s extends junit.framework.TestCase {\n",
 //				className);
 //		wr.println();
@@ -563,13 +573,6 @@ public final class CSharpPrintMethod implements LanguagePrintMethod {
 	@Override
 	public void printReplaceEnd(PrintWriter wr) {
 		wr.println(CSharpPrintMethod.REPLACE_END);
-	}
-
-	@Override
-	public void printPackagePrologue(PrintWriter wr, String name) {
-		if(name != null && !name.equals("")) {
-			wr.printf("namespace %s\n{\n", name);
-		}
 	}
 
 	@Override
