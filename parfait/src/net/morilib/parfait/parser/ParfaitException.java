@@ -9,16 +9,11 @@ import java.util.ResourceBundle;
 public class ParfaitException extends RuntimeException {
 
 	//
-	private static final String CLSNAME;
 	private static ResourceBundle msgs;
 
 	//
 	static {
-		String p;
-
-		p = ParfaitException.class.getPackage().getName();
-		CLSNAME = p.replace('.', '/');
-		msgs = ResourceBundle.getBundle(CLSNAME + "/messages");
+		msgs = ResourceBundle.getBundle("messages");
 	}
 
 	//
