@@ -1,6 +1,7 @@
 package net.morilib.parfait.parser;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -90,17 +91,26 @@ public class ParseParfait {
 		stat = S_INIT;
 		StringBuilder buf1 = new StringBuilder();
 		String typ = "";
-		while(!"%%".equals(line = rd.readLine())) {
+		outer: while(true) {
 			Matcher m;
 
-			if(line == null) {
+			if((line = rd.readLine()) == null) {
 				throw new ParfaitException("unexpectedeof");
 			}
 
 			switch(stat) {
 			case S_INIT:
-				if(line.equals("%ignoreCase")) {
+				if(line.equals("%%")) {
+					break outer;
+				} else if(line.equals("%ignoreCase")) {
 					ignoreCase = true;
+				} else if((m = PART.matcher(line)).matches()) {
+					typ = m.group(1);
+					buf1 = new StringBuilder();
+					stat = S_PART;
+				} else if((m = COL.matcher(line)).matches()) {
+					columns = m.group(1);
+					pluslen = m.group(3) != null;
 				} else if((m = DET.matcher(line)).matches()) {
 					if(m.group(1).equals("language")) {
 						method = getLanguage(m.group(2));
@@ -113,13 +123,6 @@ public class ParseParfait {
 					} else if(m.group(1).equals("output")) {
 						format = getFormat(m.group(2));
 					}
-				} else if((m = PART.matcher(line)).matches()) {
-					typ = m.group(1);
-					buf1 = new StringBuilder();
-					stat = S_PART;
-				} else if((m = COL.matcher(line)).matches()) {
-					columns = m.group(1);
-					pluslen = m.group(3) != null;
 				}
 				break;
 			case S_PART:
@@ -151,13 +154,13 @@ public class ParseParfait {
 			if(line == null) {
 				throw new ParfaitException("unexpectedeof");
 			} else if(!(m = ACTION.matcher(line)).matches()) {
-				buf.append(line.trim()).append('\n');
+				buf.append('\n').append(line.trim());
 			} else {
 				if(word != null) {
 					map.put(word, buf.toString());
 				}
 				word = m.group(1);
-				buf = new StringBuilder(m.group(3).trim()).append('\n');
+				buf = new StringBuilder(m.group(3).trim());
 			}
 		}
 
@@ -186,9 +189,11 @@ public class ParseParfait {
 		}
 
 		try {
+			File fo = new File(fname);
+
 			pw = new PrintWriter(new OutputStreamWriter(
 					new FileOutputStream(method.getTargetFilename(
-							fname))));
+							fo.getName()))));
 			format.print(pw, method, pkg, columns, pluslen, ignoreCase,
 					name, map, defaultAction, license, prologue,
 					description, aux.toString(), type);
