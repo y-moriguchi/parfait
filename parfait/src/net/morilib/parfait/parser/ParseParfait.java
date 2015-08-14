@@ -29,7 +29,7 @@ public class ParseParfait {
 	private static final Pattern DET = Pattern.compile(
 			"^%([A-Za-z0-9]+)[\\s]+(.*)[\\s]*$");
 	private static final Pattern COL = Pattern.compile(
-			"^%column[\\s]+\\[(-[0-9]+(,-[0-9])*)\\](\\+length)?[\\s]*$");
+			"^%column[\\s]+\\[(-?[0-9]+(,-?[0-9])*)\\](\\+length)?[\\s]*$");
 	private static final Pattern PART = Pattern.compile(
 			"^%([A-Za-z0-9]*)[\\s]*\\{[\\s]*$");
 	private static final Pattern ACTION = Pattern.compile(
@@ -185,6 +185,21 @@ public class ParseParfait {
 		if(method instanceof CSharpPrintMethod) {
 			if(format instanceof EnumHashFormatter) {
 				throw new ParfaitException("unknownoutput", "enum");
+			}
+		}
+
+		if(map.size() == 0) {
+			throw new ParfaitException("requiredword");
+		}
+
+		int minl = Integer.MAX_VALUE;
+		for(String s : map.keySet()) {
+			minl = s.length() < minl ? s.length() : minl;
+		}
+		for(String s : columns.split(",")) {
+			int i = Integer.parseInt(s);
+			if(i >= minl || i < -minl) {
+				throw new ParfaitException("lengthtoolong", i);
 			}
 		}
 
